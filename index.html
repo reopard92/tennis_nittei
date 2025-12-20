@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TENNIS CHRONICLES</title>
+    <title>CODE NAME: 27</title>
     <link rel="manifest" href="manifest.json">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black">
@@ -281,7 +281,7 @@
 
 
         /* FOOTER */
-        .bottom-nav { position: fixed; bottom: 0; left: 0; width: 100%; background: rgba(10, 10, 15, 0.95); backdrop-filter: blur(10px); border-top: 1px solid rgba(255, 255, 255, 0.15); display: flex; justify-content: space-around; padding: 10px 0; z-index: 1000; }
+        .bottom-nav { position: fixed; bottom: 0; left: 0; width: 100%; background: rgba(10, 10, 15, 0.95); backdrop-filter: blur(10px); border-top: 1px solid rgba(255, 255, 255, 0.15); display: flex; justify-content: space-around; padding: 15px 0 30px 0; z-index: 1000; }
         .nav-item { background: none; border: none; color: #555; font-size: 0.6rem; display: flex; flex-direction: column; align-items: center; cursor: pointer; width: 20%; }
         .nav-icon { font-size: 1.2rem; margin-bottom: 3px; filter: grayscale(100%) brightness(0.7); }
         .nav-item.active { color: #fff; }
@@ -891,7 +891,7 @@
             tel: "042-591-1212",
             hours: "9:00～18:00",
             // Standard Google Maps Embed for search query "百草テニスガーデン"
-            mapSrc: "https://googleusercontent.com/maps.google.com/4"
+            mapSrc: "https://googleusercontent.com/maps.google.com/5"
         }
     };
 
@@ -911,10 +911,7 @@
         const displayAddress = "〒191-0033<br>東京都日野市百草878−1";
 
         c.innerHTML = `
-            <div class="map-frame">
-                <iframe src="${data.mapSrc}" frameborder="0" scrolling="no" marginheight="0" marginwidth="0"></iframe>
-            </div>
-            <div class="info-card">
+            <div class="info-card" style="margin-top:20px;">
                 <div class="info-row"><div class="info-label">SECTOR</div><div class="info-val" style="color:#00ffff; font-weight:bold;">${data.name}</div></div>
                 <div class="info-row">
                     <div class="info-label">ADDRESS</div>
