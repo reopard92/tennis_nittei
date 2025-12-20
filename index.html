@@ -3,12 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CODE NAME: 26 PWA</title>
+    <title>TENNIS CHRONICLES</title>
     <link rel="manifest" href="manifest.json">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black">
     <meta name="apple-mobile-web-app-title" content="TENNIS">
-    <link rel="apple-touch-icon" href="icon.png">
+    <link rel="apple-touch-icon" href="./icon.png">
     
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
@@ -802,6 +802,18 @@
 <div id="toast"></div>
 
 <script>
+    // ▼ここから追加
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', function() {
+            navigator.serviceWorker.register('sw.js').then(function(registration) {
+                console.log('ServiceWorker registration successful');
+            }, function(err) {
+                console.log('ServiceWorker registration failed: ', err);
+            });
+        });
+    }
+    // ▲ここまで追加
+
     const GAS_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzoybbIaxOq4EtWaBkvdPNzkN1_7lmFRnAQLbnu6A40YUQdbzX6gTfIY5CznZs13GYxZw/exec";
     const members = ["周平", "すが", "凌矢", "祐介", "志村", "加登", "小田"];
     const STORAGE_KEY = 'tennis_match_data_v7_holo';
@@ -879,7 +891,7 @@
             tel: "042-591-1212",
             hours: "9:00～18:00",
             // Standard Google Maps Embed for search query "百草テニスガーデン"
-            mapSrc: "https://maps.google.com/maps?q=%E7%99%BE%E8%8D%89%E3%83%86%E3%83%8B%E3%82%B9%E3%82%AC%E3%83%87%E3%83%B3&t=&z=15&ie=UTF8&iwloc=&output=embed"
+            mapSrc: "https://googleusercontent.com/maps.google.com/4"
         }
     };
 
@@ -1572,4 +1584,84 @@
 
     function showModal(name) {
         const p = playerStatsGlobal[name]; const max = playerStatsGlobal._max; if(!p) return;
-        document.getElementById('modalPlayerName').textContent = p
+        document.getElementById('modalPlayerName').textContent = p.name;
+        document.getElementById('modalMedals').innerHTML = getMedals(p, max);
+        
+        const ri = getRankInfo(p.games);
+        let barW = 100, txt = "MAX RANK";
+        if(ri.next) {
+            const range = ri.next.min - ri.current.min;
+            const cur = p.games - ri.current.min;
+            barW = Math.min((cur/range)*100, 100);
+            txt = `経験値: ${p.games} / ${ri.next.min} (次: ${ri.next.name})`;
+        } else { txt = `経験値: ${p.games} (提督)`; }
+        
+        document.getElementById('rankInfoArea').innerHTML = `
+            <div class="rank-name">${ri.current.name} <span>${ri.current.icon}</span></div>
+            <div class="rank-progress-text">${txt}</div>
+            <div class="rank-bar-bg"><div class="rank-bar-fill" style="width:${barW}%"></div></div>`;
+        
+        document.getElementById('playerModal').style.display = 'flex';
+
+        const ctxR = document.getElementById('radarChart').getContext('2d');
+        if(radarChartInstance) radarChartInstance.destroy();
+        
+        // 【修正 21】 Safe Calculation & Fixed Scale
+        const safeCalc = (val, maxVal) => maxVal > 0 ? (val / maxVal) * 100 : 0;
+
+        radarChartInstance = new Chart(ctxR, {
+            type: 'radar',
+            data: {
+                labels: ['勝率', '勝利', 'MVP', '試合数', 'ゲーム'],
+                datasets: [{ 
+                    label: '能力値', 
+                    data: [
+                        p.wins + p.losses > 0 ? (p.wins/(p.wins+p.losses)*100) : 0, 
+                        safeCalc(p.wins, max.wins), 
+                        safeCalc(p.mvpCount, max.mvpCount), 
+                        safeCalc(p.matches, max.matches), 
+                        safeCalc(p.games, max.games)
+                    ], 
+                    backgroundColor:'rgba(0,255,255,0.2)', borderColor:'#00ffff', borderWidth:2 
+                }]
+            },
+            options: { 
+                responsive:true, 
+                maintainAspectRatio:false, 
+                scales:{
+                    r:{
+                        angleLines:{color:'rgba(255,255,255,0.2)'}, 
+                        grid:{color:'rgba(255,255,255,0.2)'}, 
+                        pointLabels:{color:'#00ffff',font:{size:9}}, 
+                        ticks:{display:false}, // Hide numbers
+                        min: 0, // Fixed min
+                        max: 100 // Fixed max for everyone
+                    }
+                },
+                plugins: {
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                return context.dataset.label + ': ' + context.raw.toFixed(1);
+                            }
+                        }
+                    }
+                }
+            } 
+        });
+
+        const ctxH = document.getElementById('historyChart').getContext('2d');
+        if(historyChartInstance) historyChartInstance.destroy();
+        const hist = p.history.sort((a,b)=>new Date(a.date)-new Date(b.date));
+        historyChartInstance = new Chart(ctxH, {
+            type: 'line',
+            data: { labels: hist.map(h=>h.date.slice(5)), datasets: [{ label:'勝率推移', data: hist.map(h=>h.rate), borderColor:'#f0f', backgroundColor:'rgba(255,0,255,0.1)', borderWidth:2, tension:0.3, fill:true }] },
+            options: { responsive:true, maintainAspectRatio:false, scales:{y:{beginAtZero:true,max:100,grid:{color:'rgba(255,255,255,0.1)'}},x:{grid:{display:false}}} }
+        });
+    }
+
+    function closeModal(e) { if(e.target.id==='playerModal'||e.target.className==='close-btn') document.getElementById('playerModal').style.display='none'; }
+</script>
+
+</body>
+</html>
