@@ -31,6 +31,8 @@
             min-height: 100vh;
             overflow-x: hidden;
             padding-bottom: 80px;
+            /* Pull to Refresh用 */
+            overscroll-behavior-y: contain; 
         }
         .container {
             max-width: 900px;
@@ -613,6 +615,10 @@
     <div class="loader-bar"></div>
 </div>
 
+<div id="refresh-loader" style="position:fixed; top:-60px; left:0; width:100%; height:60px; display:flex; justify-content:center; align-items:center; z-index:1100; pointer-events:none; transition: top 0.3s;">
+    <div id="refresh-icon" style="font-size:2rem; color:#00ffff; text-shadow:0 0 10px #00ffff;">❖</div>
+</div>
+
 <div class="container">
     <header class="app-header">
         <h1 id="pageTitle">TENNIS CHRONICLES</h1>
@@ -802,7 +808,7 @@
 <div id="toast"></div>
 
 <script>
-    // ▼ここから追加
+    // ▼ここから追加 (PWA)
     if ('serviceWorker' in navigator) {
         window.addEventListener('load', function() {
             navigator.serviceWorker.register('sw.js').then(function(registration) {
@@ -812,7 +818,67 @@
             });
         });
     }
-    // ▲ここまで追加
+    
+    // ▼ Pull to Refresh Logic
+    let startY = 0;
+    let isPulling = false;
+    const loader = document.getElementById('refresh-loader');
+    const icon = document.getElementById('refresh-icon');
+
+    window.addEventListener('touchstart', (e) => {
+        if (window.scrollY === 0) {
+            startY = e.touches[0].clientY;
+            isPulling = true;
+        }
+    }, {passive: true});
+
+    window.addEventListener('touchmove', (e) => {
+        if (!isPulling) return;
+        const currentY = e.touches[0].clientY;
+        const diff = currentY - startY;
+        
+        if (diff > 0 && window.scrollY === 0) {
+            // 引っ張っている間
+            if (diff < 150) { // 最大距離制限
+                loader.style.transition = 'none'; // 即座に追従させる
+                loader.style.top = (diff / 2 - 60) + 'px'; // 抵抗をつけて位置計算
+                icon.style.transform = `rotate(${diff * 2}deg)`; // 回転演出
+            }
+        } else {
+            isPulling = false;
+            loader.style.transition = 'top 0.3s';
+            loader.style.top = '-60px';
+        }
+    }, {passive: true});
+
+    window.addEventListener('touchend', (e) => {
+        if (!isPulling) return;
+        isPulling = false;
+        const currentY = e.changedTouches[0].clientY;
+        const diff = currentY - startY;
+
+        if (diff > 100 && window.scrollY === 0) { // しきい値
+            // 更新実行
+            loader.style.transition = 'top 0.3s';
+            loader.style.top = '20px'; // 表示位置で固定
+            icon.classList.add('spinning'); // 回転クラス付与
+            
+            // データを再取得
+            fetchAnalysisData().then(() => {
+                // 完了後少し待ってから戻す
+                setTimeout(() => {
+                    loader.style.top = '-60px';
+                    icon.classList.remove('spinning');
+                    showToast("DATA UPDATED");
+                }, 800);
+            });
+        } else {
+            // キャンセル
+            loader.style.transition = 'top 0.3s';
+            loader.style.top = '-60px';
+        }
+    });
+    // ▲ Pull to Refresh Logic End
 
     const GAS_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzoybbIaxOq4EtWaBkvdPNzkN1_7lmFRnAQLbnu6A40YUQdbzX6gTfIY5CznZs13GYxZw/exec";
     const members = ["周平", "すが", "凌矢", "祐介", "志村", "加登", "小田"];
@@ -891,7 +957,7 @@
             tel: "042-591-1212",
             hours: "9:00～18:00",
             // Standard Google Maps Embed for search query "百草テニスガーデン"
-            mapSrc: "https://googleusercontent.com/maps.google.com/5"
+            mapSrc: "" // Map removed
         }
     };
 
