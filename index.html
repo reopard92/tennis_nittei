@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CODE NAME: 29</title>
+    <title>CODE NAME: 30</title>
     <link rel="manifest" href="manifest.json">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black">
@@ -71,19 +71,19 @@
             margin-top: 5px;
         }
         
-        /* HAMBURGER MENU */
+        /* HAMBURGER MENU (Updated Position & Size) */
         .hamburger-btn {
             position: fixed;
             top: 15px;
-            left: 15px;
+            right: 15px; /* Moved to Right */
             z-index: 4001;
             background: rgba(0,0,0,0.6);
             border: 1px solid rgba(0,255,255,0.5);
             border-radius: 4px;
-            padding: 8px;
+            padding: 6px; /* Slightly reduced padding */
             cursor: pointer;
-            width: 40px;
-            height: 40px;
+            width: 32px; /* Smaller size (was 40px) */
+            height: 32px; /* Smaller size (was 40px) */
             display: flex;
             flex-direction: column;
             justify-content: space-around;
@@ -91,7 +91,7 @@
             box-shadow: 0 0 10px rgba(0,255,255,0.2);
         }
         .hamburger-bar {
-            width: 24px;
+            width: 18px; /* Smaller bar width (was 24px) */
             height: 2px;
             background-color: #00ffff;
             box-shadow: 0 0 5px #00ffff;
@@ -946,7 +946,7 @@
 
 <nav id="bottomNav" class="bottom-nav">
     <button class="nav-item active" onclick="switchMainView('match')"><span class="nav-icon">🎾</span>INPUT</button>
-    <button class="nav-item" onclick="switchMainView('dashboard')"><span class="nav-icon">📈</span>TOP</button>
+    <button class="nav-item" onclick="switchMainView('dashboard')"><span class="nav-icon">📈</span>DATA</button>
     <button class="nav-item" onclick="switchMainView('ranking')"><span class="nav-icon">👑</span>RANK</button>
     <button class="nav-item" onclick="switchMainView('map')"><span class="nav-icon">🗺️</span>MAP</button>
     <button class="nav-item" onclick="switchMainView('learn')"><span class="nav-icon">🧠</span>LEARN</button>
