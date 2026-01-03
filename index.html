@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CODE NAME: 27</title>
+    <title>CODE NAME: 29</title>
     <link rel="manifest" href="manifest.json">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black">
@@ -70,13 +70,91 @@
             letter-spacing: 2px;
             margin-top: 5px;
         }
-        /* REFRESH button removed */
+        
+        /* HAMBURGER MENU */
+        .hamburger-btn {
+            position: fixed;
+            top: 15px;
+            left: 15px;
+            z-index: 4001;
+            background: rgba(0,0,0,0.6);
+            border: 1px solid rgba(0,255,255,0.5);
+            border-radius: 4px;
+            padding: 8px;
+            cursor: pointer;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-around;
+            align-items: center;
+            box-shadow: 0 0 10px rgba(0,255,255,0.2);
+        }
+        .hamburger-bar {
+            width: 24px;
+            height: 2px;
+            background-color: #00ffff;
+            box-shadow: 0 0 5px #00ffff;
+            transition: 0.3s;
+        }
+        .side-menu-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.85);
+            backdrop-filter: blur(10px);
+            z-index: 4000;
+            display: none;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        .side-menu-overlay.open {
+            display: flex;
+            opacity: 1;
+        }
+        .side-menu-content {
+            width: 80%;
+            max-width: 300px;
+            height: 100%;
+            background: rgba(10, 15, 20, 0.95);
+            border-right: 1px solid rgba(0,255,255,0.3);
+            padding-top: 80px;
+            display: flex;
+            flex-direction: column;
+            transform: translateX(-100%);
+            transition: transform 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
+        }
+        .side-menu-overlay.open .side-menu-content {
+            transform: translateX(0);
+        }
+        .menu-item {
+            padding: 20px 30px;
+            color: #fff;
+            font-size: 1.1rem;
+            letter-spacing: 2px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            cursor: pointer;
+            transition: 0.2s;
+            text-transform: uppercase;
+        }
+        .menu-item:hover {
+            background: rgba(0,255,255,0.1);
+            padding-left: 40px;
+            color: #00ffff;
+        }
+        .menu-item.active {
+            color: #00ffff;
+            border-left: 4px solid #00ffff;
+            background: rgba(0,255,255,0.05);
+        }
 
         .view-section { display: none; animation: fadeIn 0.4s ease; }
         .view-section.active { display: block; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* INPUT STYLES */
+        /* INPUT STYLES - REVISED (Coin Toss Removed) */
         .input-header-area { position: relative; margin-bottom: 40px; min-height: 80px; }
         #matchDate { position: absolute; top: 5px; right: 0; color: #fff; font-size: 0.9rem; letter-spacing: 1px; }
         #courtSelect {
@@ -87,18 +165,25 @@
         }
         #courtSelect:focus { outline: none; border-bottom-color: #fff; background-color: #000; }
         #courtSelect option { background-color: #000; color: #fff; }
-        .coin-toss-section { position: absolute; top: 0; left: 0; width: 80px; text-align: center; }
-        .coin {
-            width: 36px; height: 36px; margin: 0 auto 5px;
-            background: radial-gradient(circle at 30% 30%, #ffffff, #b0bec5);
-            box-shadow: 0 0 15px rgba(255, 255, 255, 0.4); border-radius: 50%;
-            display: flex; align-items: center; justify-content: center;
-            font-size: 0.7rem; font-weight: bold; color: #333;
-            cursor: pointer;
+        
+        /* Coin Toss Styles (Moved to Game Modal) */
+        .coin-game-container {
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            height: 300px;
         }
-        /* btn-toss removed */
+        .coin-large {
+            width: 120px; height: 120px;
+            background: radial-gradient(circle at 30% 30%, #ffffff, #b0bec5);
+            box-shadow: 0 0 30px rgba(255, 255, 255, 0.4); border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.5rem; font-weight: bold; color: #333;
+            cursor: pointer;
+            margin-bottom: 30px;
+            border: 4px solid #fff;
+        }
         .spinning { animation: spin 0.5s infinite ease-in-out; }
         @keyframes spin { 0% { transform: rotateY(0deg); } 100% { transform: rotateY(360deg); } }
+        
         .round-title {
             color: #fff; font-size: 1rem; font-weight: 300; letter-spacing: 3px;
             margin-bottom: 20px; border-left: 2px solid rgba(255, 255, 255, 0.5); padding-left: 12px; display: inline-block;
@@ -139,6 +224,89 @@
         /* Layout control for header buttons */
         .header-ctrl-area { position: absolute; top: 0; right: 0; margin-top: 60px; display: flex; gap: 10px; }
         
+        /* GAME PORTAL STYLES (NEW) */
+        .game-hero {
+            background: linear-gradient(to bottom, rgba(0,0,0,0.3), rgba(0,0,0,0.8)), url('https://images.unsplash.com/photo-1614728263952-84ea256f9679?q=80&w=1000&auto=format&fit=crop');
+            background-size: cover;
+            background-position: center;
+            border-radius: 8px;
+            padding: 40px 20px;
+            text-align: center;
+            margin-bottom: 40px;
+            border: 1px solid rgba(0,255,255,0.3);
+            box-shadow: 0 0 20px rgba(0,255,255,0.1);
+            position: relative;
+            overflow: hidden;
+        }
+        .game-hero::before {
+            content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 2px;
+            background: linear-gradient(90deg, transparent, #00ffff, transparent);
+            box-shadow: 0 0 10px #00ffff;
+        }
+        .game-tag {
+            display: inline-block;
+            background: rgba(0,255,255,0.1);
+            color: #00ffff;
+            padding: 4px 12px;
+            font-size: 0.7rem;
+            letter-spacing: 2px;
+            margin-bottom: 10px;
+            border: 1px solid rgba(0,255,255,0.3);
+        }
+        .game-hero h2 {
+            font-size: 1.8rem;
+            margin: 10px 0;
+            text-shadow: 0 0 15px rgba(255,255,255,0.5);
+            font-weight: 300;
+        }
+        .game-hero p { color: #aaa; font-size: 0.9rem; margin-bottom: 20px; }
+        .btn-hero {
+            background: #00ffff; color: #000; border: none;
+            padding: 10px 30px; font-weight: bold; letter-spacing: 2px;
+            cursor: pointer; box-shadow: 0 0 15px rgba(0,255,255,0.5);
+            transition: 0.3s;
+        }
+        .btn-hero:hover { background: #fff; box-shadow: 0 0 25px rgba(0,255,255,0.8); }
+
+        .game-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            gap: 20px;
+        }
+        .game-card {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: 0.3s;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            aspect-ratio: 1 / 1;
+        }
+        .game-card:hover {
+            background: rgba(255,255,255,0.1);
+            border-color: rgba(0,255,255,0.5);
+            transform: translateY(-5px);
+        }
+        .game-card.locked { opacity: 0.5; cursor: not-allowed; }
+        .game-card.locked:hover { transform: none; border-color: rgba(255,255,255,0.1); }
+        .game-icon { font-size: 2.5rem; margin-bottom: 15px; filter: drop-shadow(0 0 5px rgba(255,255,255,0.3)); }
+        .game-card-title { font-size: 0.8rem; font-weight: bold; color: #fff; letter-spacing: 1px; }
+        .game-status {
+            position: absolute; top: 10px; right: -25px;
+            background: #333; color: #888;
+            font-size: 0.5rem; padding: 2px 25px;
+            transform: rotate(45deg);
+            width: 80px; text-align: center;
+        }
+        .game-status.live { background: #00ffff; color: #000; font-weight: bold; }
+        
         /* ANALYSIS STYLES */
         .dashboard-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 15px; margin-bottom: 30px; }
         .stat-card { background: rgba(20, 20, 30, 0.4); padding: 15px; text-align: center; border: 1px solid rgba(255,255,255,0.1); }
@@ -156,7 +324,7 @@
         .log-date { color: #fff; font-weight: bold; font-size: 1rem; }
         .log-content { display: none; padding: 15px; background: rgba(0, 0, 0, 0.3); }
         .log-content.open { display: block; animation: fadeIn 0.3s; }
-        #playerModal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 2000; justify-content: center; align-items: center; }
+        #playerModal, #coinGameModal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 2000; justify-content: center; align-items: center; }
         .modal-content { background: rgba(15, 20, 30, 0.95); border: 1px solid #00ffff; box-shadow: 0 0 30px rgba(0, 255, 255, 0.2); width: 90%; max-width: 500px; max-height: 90vh; overflow-y: auto; padding: 30px; position: relative; }
         .close-btn { position: absolute; top: 15px; right: 15px; color: #fff; background: none; border: none; font-size: 1.5rem; cursor: pointer; }
         .modal-title { color: #fff; font-weight: 300; text-align: center; font-size: 1.5rem; margin-bottom: 10px; letter-spacing: 2px; }
@@ -281,7 +449,8 @@
 
 
         /* FOOTER */
-        .bottom-nav { position: fixed; bottom: 0; left: 0; width: 100%; background: rgba(10, 10, 15, 0.95); backdrop-filter: blur(10px); border-top: 1px solid rgba(255, 255, 255, 0.15); display: flex; justify-content: space-around; padding: 15px 0 30px 0; z-index: 1000; }
+        .bottom-nav { position: fixed; bottom: 0; left: 0; width: 100%; background: rgba(10, 10, 15, 0.95); backdrop-filter: blur(10px); border-top: 1px solid rgba(255, 255, 255, 0.15); display: flex; justify-content: space-around; padding: 15px 0 30px 0; z-index: 1000; transition: transform 0.3s ease; }
+        .bottom-nav.hidden { transform: translateY(100%); }
         .nav-item { background: none; border: none; color: #555; font-size: 0.6rem; display: flex; flex-direction: column; align-items: center; cursor: pointer; width: 20%; }
         .nav-icon { font-size: 1.2rem; margin-bottom: 3px; filter: grayscale(100%) brightness(0.7); }
         .nav-item.active { color: #fff; }
@@ -333,14 +502,13 @@
 
 
         /* =========================================
-           SMARTPHONE OPTIMIZATION (Layout Fix: Full Width & Align)
+           SMARTPHONE OPTIMIZATION
            ========================================= */
         @media (max-width: 600px) {
-            /* コンテナの余白を極限まで削る */
             .container { padding: 5px; padding-bottom: 80px; }
             .header-area { margin-top: 10px; }
             
-            /* --- HEADER LAYOUT FIX FOR MOBILE --- */
+            /* --- HEADER LAYOUT FIX FOR MOBILE (COIN REMOVED) --- */
             .input-header-area {
                 display: grid;
                 grid-template-columns: 1fr 1fr;
@@ -349,33 +517,24 @@
                 min-height: auto;
                 margin-bottom: 20px;
             }
-            .coin-toss-section {
-                position: relative;
-                top: auto; left: auto;
-                width: auto;
-                grid-column: 1;
-                /* 【修正 09】Left align coin, remove flex column, zero margins */
-                text-align: left;
-                display: block;
-                margin-left: 0;
-            }
+            /* Coin section removed from here */
+
             #matchDate {
                 position: relative;
                 top: auto; right: auto;
                 grid-column: 2;
                 text-align: right;
                 font-size: 0.8rem;
-                margin-top: 8px; /* Vertical align adjustment */
+                margin-top: 8px;
             }
             #courtSelect {
                 grid-column: 1 / 3;
-                width: 80%; /* not 100% to look like a centered box */
+                width: 80%;
                 max-width: 300px;
-                margin: 0 auto; /* Center alignment */
+                margin: 0 auto;
                 display: block;
-                /* 【修正】Center text in dropdown */
                 text-align: center;
-                text-align-last: center; /* For iOS Safari */
+                text-align-last: center;
             }
             .header-ctrl-area {
                 position: relative;
@@ -384,10 +543,6 @@
                 grid-column: 1 / 3;
                 justify-content: flex-end;
             }
-            
-            /* 【修正 09】Larger Icon, force no margin to sit on left edge */
-            .coin { width: 40px; height: 40px; font-size: 0.7rem; margin: 0; }
-            /* ----------------------------------- */
             
             .player-inputs {
                 grid-template-columns: 1fr;
@@ -407,24 +562,20 @@
                 font-size: 0.8rem;
             }
             
-            /* 【修正】Center Title, Remove Left Padding */
             h1 { font-size: 1.4rem; padding-left: 0; text-align: center; }
 
-            /* 【修正】INPUTテーブル: 幅制限なし (100%) */
             #r1_matchTableBody, #r2_matchTableBody {
                 display: block;
-                width: 100%; /* フルワイド */
+                width: 100%;
             }
             
-            /* 【重要修正】テーブル自体の表示形式を変更し、幅を強制確保 */
             table {
                 width: 100% !important;
                 display: block;
             }
             
-            /* 【修正 03/04】INPUT対戦テーブル以外のテーブル（ランキング、ペア、ログ）を通常表示に戻す */
             .standard-table {
-                display: table !important; /* ブロック解除 */
+                display: table !important;
                 width: 100% !important;
                 box-sizing: border-box;
             }
@@ -433,7 +584,7 @@
             .standard-table tr { 
                 display: table-row !important; 
                 width: auto !important; 
-                grid-template-columns: none !important; /* grid解除 */
+                grid-template-columns: none !important;
                 border: none !important;
                 background: transparent !important;
                 padding: 0 !important;
@@ -460,8 +611,6 @@
                 border-radius: 4px;
                 background: rgba(20,20,30,0.6);
                 padding: 10px;
-                
-                /* 【修正】幅を固定せず100%にする (max-width削除) */
                 width: 100% !important;
                 max-width: none !important;
                 margin-left: 0;
@@ -478,7 +627,6 @@
                 text-align: center;
             }
 
-            /* 1. 試合番号 */
             #r1_matchTableBody td:nth-of-type(1), #r2_matchTableBody td:nth-of-type(1) {
                 grid-row: 1;
                 text-align: center;
@@ -489,19 +637,17 @@
                 margin-bottom: 5px;
             }
             
-            /* 2. ペアA (名前) 【修正：左寄せ】 */
             #r1_matchTableBody td:nth-of-type(2), #r2_matchTableBody td:nth-of-type(2) {
                 grid-row: 2;
-                text-align: left !important; /* 強制左寄せ */
+                text-align: left !important;
                 font-size: 0.9rem;
                 border: none;
                 padding: 2px 0;
                 color: #fff;
-                white-space: normal; /* 折り返し許可 */
+                white-space: normal;
                 word-break: break-all;
             }
             
-            /* 3. スコアA */
             #r1_matchTableBody td:nth-of-type(3), #r2_matchTableBody td:nth-of-type(3) {
                 grid-row: 3;
                 text-align: left;
@@ -511,7 +657,6 @@
                 align-items: center;
             }
 
-            /* 4. VS & ゲージ (中央) */
             #r1_matchTableBody td:nth-of-type(4), #r2_matchTableBody td:nth-of-type(4) {
                 grid-row: 3;
                 text-align: center;
@@ -529,7 +674,6 @@
                 gap: 5px;
             }
 
-            /* 5. スコアB */
              #r1_matchTableBody td:nth-of-type(5), #r2_matchTableBody td:nth-of-type(5) {
                 grid-row: 3;
                 text-align: right;
@@ -540,19 +684,17 @@
                 align-items: center;
             }
 
-            /* 6. ペアB (名前) 【修正：右寄せ】 */
             #r1_matchTableBody td:nth-of-type(6), #r2_matchTableBody td:nth-of-type(6) {
                 grid-row: 4;
-                text-align: right !important; /* 強制右寄せ */
+                text-align: right !important;
                 font-size: 0.9rem;
                 border: none;
                 padding: 2px 0;
                 color: #fff;
-                white-space: normal; /* 折り返し許可 */
+                white-space: normal;
                 word-break: break-all;
             }
 
-            /* 7. REST */
             #r1_matchTableBody td:nth-of-type(7), #r2_matchTableBody td:nth-of-type(7) {
                 grid-row: 5;
                 text-align: center;
@@ -566,9 +708,8 @@
                 color: #888;
             }
             
-            /* 配置調整用のグリッド再定義（行内） */
             #r1_matchTableBody tr, #r2_matchTableBody tr {
-                 grid-template-columns: 60px 1fr 60px; /* スコア - 名前/VS - スコア */
+                 grid-template-columns: 60px 1fr 60px;
             }
             #r1_matchTableBody td:nth-of-type(1), 
             #r1_matchTableBody td:nth-of-type(2), 
@@ -578,25 +719,23 @@
             #r2_matchTableBody td:nth-of-type(2), 
             #r2_matchTableBody td:nth-of-type(6), 
             #r2_matchTableBody td:nth-of-type(7) {
-                grid-column: 1 / 4; /* 全幅 */
+                grid-column: 1 / 4;
             }
             #r1_matchTableBody td:nth-of-type(3), #r2_matchTableBody td:nth-of-type(3) {
-                grid-column: 1; /* 左 */
+                grid-column: 1;
             }
             #r1_matchTableBody td:nth-of-type(4), #r2_matchTableBody td:nth-of-type(4) {
-                grid-column: 2; /* 中央 (VSゲージ) */
+                grid-column: 2;
             }
              #r1_matchTableBody td:nth-of-type(5), #r2_matchTableBody td:nth-of-type(5) {
-                grid-column: 3; /* 右 */
+                grid-column: 3;
             }
             
             .stat-value { font-size: 1.5rem; }
-            /* Legend Fix for Mobile: Horizontal */
             .medal-legend span, .rank-legend span { display: inline-block; margin-right: 8px; margin-bottom: 3px; font-size: 0.65rem; }
             
-            /* 【修正 21】 Mobile Video Grid: 2 Columns */
             .video-grid {
-                grid-template-columns: repeat(2, 1fr); /* 2 columns */
+                grid-template-columns: repeat(2, 1fr);
                 gap: 10px;
             }
             .video-title { font-size: 0.75rem; }
@@ -613,6 +752,19 @@
     <div class="loader-bar"></div>
 </div>
 
+<div class="hamburger-btn" onclick="toggleSideMenu()">
+    <div class="hamburger-bar"></div>
+    <div class="hamburger-bar"></div>
+    <div class="hamburger-bar"></div>
+</div>
+
+<div id="sideMenu" class="side-menu-overlay" onclick="closeSideMenu(event)">
+    <div class="side-menu-content">
+        <div class="menu-item active" onclick="selectAppMode('tennis')">🎾 TENNIS</div>
+        <div class="menu-item" onclick="selectAppMode('game')">🎮 GAME</div>
+    </div>
+</div>
+
 <div class="container">
     <header class="app-header">
         <h1 id="pageTitle">TENNIS CHRONICLES</h1>
@@ -621,9 +773,6 @@
 
     <div id="view-match" class="view-section active">
         <div class="input-header-area">
-            <div class="coin-toss-section">
-                <div id="coin" class="coin" onclick="startCoinToss()">HEAD</div>
-            </div>
             <div id="matchDate"></div>
             <select id="courtSelect" onchange="saveState()" disabled>
                 <option value="-">-</option>
@@ -701,7 +850,6 @@
 
     <div id="view-ranking" class="view-section">
         <div class="section-title">通算個人ランキング</div>
-        
         <div class="sector-filter-area" style="text-align:center; margin-bottom:20px;">
             <select id="sectorSelect" class="sector-select" onchange="filterRanking(this.value)">
                 <option value="ALL">ALL SECTORS</option>
@@ -711,7 +859,6 @@
                 <option value="白子町">白子町</option>
             </select>
         </div>
-
         <div style="text-align:center; font-size:0.7rem; color:#888; margin-bottom:10px;">行をタップして詳細を表示</div>
         <table>
             <thead><tr><th>順位</th><th>名前</th><th>勝利数</th><th>勝率</th><th>MVP</th></tr></thead>
@@ -725,7 +872,6 @@
             <span>🌑 候補生 (0~)</span> <span>🛸 パイロット (100~)</span> <span>🛰️ 士官 (300~)</span><br>
             <span>🚀 指揮官 (600~)</span> <span>🪐 艦長 (1000~)</span> <span>🌌 提督 (2000~)</span>
         </div>
-
         <div style="margin-top: 40px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 20px;">
             <div class="section-title">最強ペアランキング</div>
             <div style="text-align:center; font-size:0.7rem; color:#666; margin-bottom:10px;">※2試合以上組んだペアのみ対象</div>
@@ -766,9 +912,39 @@
         <div id="videoGrid" class="video-grid"></div>
     </div>
 
+    <div id="view-game" class="view-section">
+        <div class="game-hero">
+            <div class="game-tag">DEV PHASE 1</div>
+            <h2>RESOURCE STRATEGY<br>CARD BATTLE</h2>
+            <p>1v1 TACTICAL CARD GAME</p>
+            <button class="btn-hero" onclick="window.location.href='https://reopard92.github.io/game/'">PLAY NOW</button>
+        </div>
+
+        <div class="section-title">MINI GAMES & TOOLS</div>
+        <div class="game-grid">
+            <div class="game-card" onclick="window.location.href='https://reopard92.github.io/game/'">
+                <div class="game-status live">BETA</div>
+                <div class="game-icon">⚔️</div>
+                <div class="game-card-title">CARD BATTLE</div>
+            </div>
+
+            <div class="game-card" onclick="openCoinGame()">
+                <div class="game-status live">LIVE</div>
+                <div class="game-icon">🪙</div>
+                <div class="game-card-title">COIN TOSS</div>
+            </div>
+
+            <div class="game-card locked">
+                <div class="game-status">OFFLINE</div>
+                <div class="game-icon">🔒</div>
+                <div class="game-card-title">COMING SOON</div>
+            </div>
+        </div>
+    </div>
+
 </div>
 
-<nav class="bottom-nav">
+<nav id="bottomNav" class="bottom-nav">
     <button class="nav-item active" onclick="switchMainView('match')"><span class="nav-icon">🎾</span>INPUT</button>
     <button class="nav-item" onclick="switchMainView('dashboard')"><span class="nav-icon">📈</span>TOP</button>
     <button class="nav-item" onclick="switchMainView('ranking')"><span class="nav-icon">👑</span>RANK</button>
@@ -799,10 +975,20 @@
     </div>
 </div>
 
+<div id="coinGameModal" onclick="closeCoinGame(event)">
+    <div class="modal-content" style="max-width:300px; text-align:center;">
+        <button class="close-btn" onclick="closeCoinGame(event)">×</button>
+        <div class="modal-title">COIN TOSS</div>
+        <div class="coin-game-container">
+            <div id="gameCoin" class="coin-large" onclick="playCoinToss()">TAP</div>
+            <div style="font-size:0.8rem; color:#aaa;">TAP COIN TO FLIP</div>
+        </div>
+    </div>
+</div>
+
 <div id="toast"></div>
 
 <script>
-    // ▼ここから追加
     if ('serviceWorker' in navigator) {
         window.addEventListener('load', function() {
             navigator.serviceWorker.register('sw.js').then(function(registration) {
@@ -812,10 +998,9 @@
             });
         });
     }
-    // ▲ここまで追加
 
     const GAS_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzoybbIaxOq4EtWaBkvdPNzkN1_7lmFRnAQLbnu6A40YUQdbzX6gTfIY5CznZs13GYxZw/exec";
-    const members = ["周平", "すが", "凌矢", "祐介", "志村", "加登", "小田"];
+    const members = ["周平", "すが", "凌矢", "祐介", "志村", "カトケン", "小田"];
     const STORAGE_KEY = 'tennis_match_data_v7_holo';
     const CREW_RANKS = [
         { name: '候補生',     min: 0,   icon: '🌑' },
@@ -826,7 +1011,6 @@
         { name: '提督',       min: 2000, icon: '🌌' }
     ];
 
-    // 【修正 18】 Training Videos Data (Samples deleted, User ID added, titles modified)
     const trainingVideos = [
         { id: "IPfPjZyKzK4", cat: "SERVE", title: "切るサーブの打ち方", desc: "回転をかけるためのグリップとスイング" },
         { id: "XotQwO2eLjM", cat: "STROKE", title: "ストロークの身体操作", desc: "腰の回転より重要な膝の使い方" },
@@ -860,17 +1044,47 @@
         const dd = String(today.getDate()).padStart(2, '0');
         document.getElementById('matchDate').textContent = `${yyyy}-${mm}-${dd}`;
         fetchAnalysisData();
-        renderVideos('ALL'); // Initial render for Learn page
+        renderVideos('ALL'); 
         setTimeout(() => {
             document.getElementById('loadingScreen').style.opacity = 0;
             setTimeout(() => { document.getElementById('loadingScreen').style.display = 'none'; }, 800);
         }, 1000);
     };
 
+    // --- NAVIGATION LOGIC ---
+    function toggleSideMenu() {
+        document.getElementById('sideMenu').classList.toggle('open');
+    }
+    
+    function closeSideMenu(e) {
+        if(e.target.id === 'sideMenu') document.getElementById('sideMenu').classList.remove('open');
+    }
+
+    function selectAppMode(mode) {
+        document.getElementById('sideMenu').classList.remove('open');
+        const bottomNav = document.getElementById('bottomNav');
+        const pageTitle = document.getElementById('pageTitle');
+        const subTitle = document.querySelector('.subtitle');
+
+        if (mode === 'tennis') {
+            // Show Tennis Views
+            switchMainView('match'); // Default to match input
+            bottomNav.classList.remove('hidden');
+            pageTitle.textContent = "TENNIS CHRONICLES";
+            subTitle.textContent = "DEEP SPACE INTEGRATED SYSTEM";
+        } else if (mode === 'game') {
+            // Show Game Portal
+            document.querySelectorAll('.view-section').forEach(sec => sec.classList.remove('active'));
+            document.getElementById('view-game').classList.add('active');
+            bottomNav.classList.add('hidden');
+            pageTitle.textContent = "GAME ARCHIVE";
+            subTitle.textContent = "TACTICAL SIMULATION MODULES";
+        }
+    }
+
     function switchMainView(viewName) {
         document.querySelectorAll('.nav-item').forEach(btn => btn.classList.remove('active'));
         const navs = document.querySelectorAll('.nav-item');
-        // Nav Mapping: INPUT(0), TOP(1), RANK(2), MAP(3), LEARN(4)
         if(viewName === 'match') navs[0].classList.add('active');
         if(viewName === 'dashboard') navs[1].classList.add('active');
         if(viewName === 'ranking') navs[2].classList.add('active');
@@ -879,18 +1093,44 @@
         
         document.querySelectorAll('.view-section').forEach(sec => sec.classList.remove('active'));
         document.getElementById(`view-${viewName}`).classList.add('active');
+        
         const titles = { 'match': 'MATCH INPUT', 'dashboard': 'DASHBOARD', 'ranking': 'RANKING', 'map': 'COURT MAP', 'learn': 'TACTICAL ARCHIVES' };
         document.getElementById('pageTitle').textContent = titles[viewName] || 'TENNIS CHRONICLES';
     }
 
-    // ================== MAP LOGIC (NEW: CODE 23) ==================
+    // --- COIN TOSS GAME LOGIC ---
+    function openCoinGame() {
+        document.getElementById('coinGameModal').style.display = 'flex';
+        // Reset state
+        const c = document.getElementById('gameCoin');
+        c.classList.remove('spinning');
+        c.textContent = "TAP";
+    }
+
+    function closeCoinGame(e) {
+        if(e.target.id === 'coinGameModal' || e.target.className === 'close-btn') {
+            document.getElementById('coinGameModal').style.display = 'none';
+        }
+    }
+
+    function playCoinToss() {
+        const c = document.getElementById('gameCoin');
+        if(c.classList.contains('spinning')) return;
+        c.classList.add('spinning');
+        c.textContent = "";
+        setTimeout(() => { 
+            c.classList.remove('spinning'); 
+            c.textContent = Math.random() < 0.5 ? "HEAD" : "TAIL"; 
+        }, 1500);
+    }
+
+    // ================== MAP LOGIC ==================
     const courtDatabase = {
         "MOGUSA": {
             name: "百草テニスガーデン",
             address: "〒191-0033 東京都日野市百草878−1",
             tel: "042-591-1212",
             hours: "9:00～18:00",
-            // Standard Google Maps Embed for search query "百草テニスガーデン"
             mapSrc: "https://googleusercontent.com/maps.google.com/5"
         }
     };
@@ -898,64 +1138,33 @@
     function renderMapInfo(val) {
         const c = document.getElementById('mapContainer');
         const data = courtDatabase[val];
-
         if (!data) {
-            c.innerHTML = `
-            <div class="empty-map-state">
-                <div class="spinning" style="display:inline-block; margin-bottom:10px;">❖</div><br>
-                WAITING FOR NAVI INPUT...
-            </div>`;
+            c.innerHTML = `<div class="empty-map-state"><div class="spinning" style="display:inline-block; margin-bottom:10px;">❖</div><br>WAITING FOR NAVI INPUT...</div>`;
             return;
         }
-
         const displayAddress = "〒191-0033<br>東京都日野市百草878−1";
-
         c.innerHTML = `
             <div class="info-card" style="margin-top:20px;">
                 <div class="info-row"><div class="info-label">SECTOR</div><div class="info-val" style="color:#00ffff; font-weight:bold;">${data.name}</div></div>
                 <div class="info-row">
                     <div class="info-label">ADDRESS</div>
-                    <div class="info-val">
-                        ${displayAddress}
-                        <button onclick="copyToClipboard('${data.address}')" style="background:rgba(0,255,255,0.1); border:1px solid #00ffff; color:#00ffff; border-radius:4px; cursor:pointer; margin-left:10px; padding:2px 6px; font-size:0.7rem;">📋</button>
-                    </div>
+                    <div class="info-val">${displayAddress}<button onclick="copyToClipboard('${data.address}')" style="background:rgba(0,255,255,0.1); border:1px solid #00ffff; color:#00ffff; border-radius:4px; cursor:pointer; margin-left:10px; padding:2px 6px; font-size:0.7rem;">📋</button></div>
                 </div>
                 <div class="info-row"><div class="info-label">TEL</div><div class="info-val"><a href="tel:${data.tel}" style="color:#fff;text-decoration:none;">${data.tel}</a></div></div>
                 <div class="info-row"><div class="info-label">HOURS</div><div class="info-val">${data.hours}</div></div>
                 <div class="info-row"><div class="info-label">COST</div><div class="info-val">¥4,500/h</div></div>
-
                 <div style="margin-top:15px; padding-top:15px; border-top:1px dashed rgba(255,255,255,0.2);">
                     <div style="font-size:0.75rem; color:#00ffff; margin-bottom:5px; letter-spacing:1px;">SPLIT CALCULATOR</div>
                     <div style="display:flex; align-items:center; gap:8px; font-size:0.9rem;">
-                        COST × 
-                        <select id="calcHours" onchange="calcSplit()" style="background:rgba(0,0,0,0.5); color:#fff; border:1px solid #555; padding:4px; border-radius:4px;">
-                            <option value="3">3</option>
-                            <option value="4">4</option>
-                            <option value="5">5</option>
-                            <option value="6">6</option>
-                            <option value="7">7</option>
-                            <option value="8">8</option>
-                            <option value="9">9</option>
-                        </select>
-                        ÷ 
-                        <select id="calcMembers" onchange="calcSplit()" style="background:rgba(0,0,0,0.5); color:#fff; border:1px solid #555; padding:4px; border-radius:4px;">
-                            <option value="4">4</option>
-                            <option value="5">5</option>
-                            <option value="6">6</option>
-                        </select>
+                        COST × <select id="calcHours" onchange="calcSplit()" style="background:rgba(0,0,0,0.5); color:#fff; border:1px solid #555; padding:4px; border-radius:4px;"><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option><option value="7">7</option><option value="8">8</option><option value="9">9</option></select>
+                        ÷ <select id="calcMembers" onchange="calcSplit()" style="background:rgba(0,0,0,0.5); color:#fff; border:1px solid #555; padding:4px; border-radius:4px;"><option value="4">4</option><option value="5">5</option><option value="6">6</option></select>
                         = <span id="calcResult" style="color:#00ffff; font-weight:bold; font-size:1.1rem; margin-left:5px;">¥3,375</span>
                     </div>
                 </div>
-            </div>
-        `;
+            </div>`;
     }
 
-    function copyToClipboard(text) {
-        navigator.clipboard.writeText(text).then(() => {
-            showToast("ADDRESS COPIED");
-        });
-    }
-
+    function copyToClipboard(text) { navigator.clipboard.writeText(text).then(() => { showToast("ADDRESS COPIED"); }); }
     function calcSplit() {
         const cost = 4500;
         const members = parseInt(document.getElementById('calcMembers').value);
@@ -964,49 +1173,30 @@
         document.getElementById('calcResult').innerText = '¥' + result.toLocaleString();
     }
 
-    // ================== LEARN PAGE LOGIC (UPDATED: Option A - Modal Play with fixed sizing) ==================
+    // ================== LEARN PAGE LOGIC ==================
     function renderVideos(category) {
         const grid = document.getElementById('videoGrid');
         grid.innerHTML = "";
         const filtered = category === 'ALL' ? trainingVideos : trainingVideos.filter(v => v.cat === category);
-        
         filtered.forEach(v => {
             const card = document.createElement('div');
             card.className = 'video-card';
-            // 【修正 15】 Revert to playVideo (Modal)
             card.onclick = function() { playVideo(v.id); };
-            
             const thumbUrl = `https://img.youtube.com/vi/${v.id}/mqdefault.jpg`;
-            
-            // 【修正 19】 Option B Design (Glass) - Play icon updated
-            card.innerHTML = `
-                <div class="video-thumb" style="background-image: url('${thumbUrl}');">
-                    <div class="video-overlay"><div class="video-play-icon">▶</div></div>
-                </div>
-                <div class="video-info">
-                    <div class="video-meta"><span>${v.cat}</span></div>
-                    <div class="video-title">${v.title}</div>
-                    <div style="font-size:0.7rem; color:#aaa;">${v.desc}</div>
-                </div>`;
+            card.innerHTML = `<div class="video-thumb" style="background-image: url('${thumbUrl}');"><div class="video-overlay"><div class="video-play-icon">▶</div></div></div><div class="video-info"><div class="video-meta"><span>${v.cat}</span></div><div class="video-title">${v.title}</div><div style="font-size:0.7rem; color:#aaa;">${v.desc}</div></div>`;
             grid.appendChild(card);
         });
     }
 
-    // 【修正 15】 Option A: Modal Player Logic
     function playVideo(id) {
         const modal = document.getElementById('videoModal');
         const player = document.getElementById('videoPlayer');
-        // Autoplay enabled
         player.innerHTML = `<iframe src="https://www.youtube.com/embed/${id}?autoplay=1" allow="autoplay; encrypted-media" allowfullscreen></iframe>`;
         modal.style.display = 'flex';
     }
 
     function closeVideoModal(e) {
-        // Close if clicked on background or explicitly called
-        if(e.target.id === 'videoModal') {
-            document.getElementById('videoModal').style.display = 'none';
-            document.getElementById('videoPlayer').innerHTML = ''; // Stop video by removing iframe
-        }
+        if(e.target.id === 'videoModal') { document.getElementById('videoModal').style.display = 'none'; document.getElementById('videoPlayer').innerHTML = ''; }
     }
 
     // ================== INPUT LOGIC ==================
@@ -1039,7 +1229,6 @@
         const inputs = document.querySelectorAll('select.player-select, select#courtSelect');
         const scores = document.querySelectorAll('select.score-select');
         const sendBtn = document.getElementById('sendButton');
-
         if (isEditMode) {
             btn.textContent = "LOCK"; btn.classList.add("unlocked"); resetBtn.disabled = false; 
             inputs.forEach(el => el.disabled = false); scores.forEach(el => el.disabled = false);
@@ -1058,13 +1247,6 @@
         return s;
     }
 
-    function startCoinToss() {
-        const c = document.getElementById('coin');
-        // Removed button reference
-        c.classList.add('spinning');
-        setTimeout(() => { c.classList.remove('spinning'); c.textContent = Math.random() < 0.5 ? "HEAD" : "TAIL"; }, 1500);
-    }
-
     function secureReset() {
         if (!isEditMode) return;
         if (confirm("RESET INPUT?")) {
@@ -1080,12 +1262,7 @@
     function updatePlayerOptions(rp) {
         const selects = []; for(let i=1; i<=5; i++) selects.push(document.getElementById(`${rp}_p${i}`));
         const vals = selects.map(s => s.value).filter(v => v !== "-");
-        selects.forEach(s => {
-            s.querySelectorAll('option').forEach(o => {
-                if (o.value === "-") return;
-                o.disabled = (vals.includes(o.value) && s.value !== o.value);
-            });
-        });
+        selects.forEach(s => { s.querySelectorAll('option').forEach(o => { if (o.value === "-") return; o.disabled = (vals.includes(o.value) && s.value !== o.value); }); });
     }
 
     function checkWinner(sA, sB, cTA, cSA, cSB, cTB, rp) {
@@ -1105,65 +1282,35 @@
         const p = {}; for(let i=1; i<=5; i++) p[i] = document.getElementById(`${rp}_p${i}`).value;
         updatePlayerOptions(rp);
         const pl = {1:p[1], 2:p[2], 3:p[3], 4:p[4], 5:p[5]};
-        
         const currentScores = [];
         const oldTbody = document.getElementById(`${rp}_matchTableBody`);
         if (oldTbody) {
             for (let i = 0; i < oldTbody.rows.length; i++) {
                 const sA = oldTbody.rows[i].querySelector('select[data-type="scoreA"]');
                 const sB = oldTbody.rows[i].querySelector('select[data-type="scoreB"]');
-                currentScores.push({
-                    a: sA ? sA.value : "-",
-                    b: sB ? sB.value : "-"
-                });
+                currentScores.push({ a: sA ? sA.value : "-", b: sB ? sB.value : "-" });
             }
         }
-
         const tb = document.getElementById(`${rp}_matchTableBody`); tb.innerHTML = "";
         patterns.forEach((pat, idx) => {
             const row = document.createElement("tr");
             row.dataset.pA1=pl[pat[0]]; row.dataset.pA2=pl[pat[1]]; row.dataset.pB1=pl[pat[2]]; row.dataset.pB2=pl[pat[3]];
-            
-            // --- スマホリスト型レイアウト対応 ---
             const cNo = document.createElement("td"); cNo.textContent=`MATCH ${idx+1}`; row.appendChild(cNo);
-            
-            // ペアA
             const cTA = document.createElement("td"); cTA.textContent=`${pl[pat[0]]} & ${pl[pat[1]]}`; row.appendChild(cTA);
-            
-            // スコアA
             const cSA = document.createElement("td"); cSA.className="score-cell";
             const sA = createScoreSelect(); sA.setAttribute('data-type','scoreA'); 
             if(currentScores[idx]) sA.value = currentScores[idx].a;
             cSA.appendChild(sA); row.appendChild(cSA);
-            
             const probA = getWinProbability(pl[pat[0]], pl[pat[1]]);
             const cVs = document.createElement("td"); cVs.className="vs"; 
-            cVs.innerHTML = `
-                <div style="display:flex; flex-direction:column; align-items:center; width:100%;">
-                    <div style="font-size:0.6rem; color:#aaa; margin-bottom:2px;">WIN PROBABILITY</div>
-                    <div style="display:flex; width:80%; height:4px; background:#333; border-radius:2px; overflow:hidden;">
-                        <div style="width:${probA}%; background:#00ffff; box-shadow:0 0 5px #00ffff;"></div>
-                        <div style="width:${100-probA}%; background:#555;"></div>
-                    </div>
-                    <div style="display:flex; justify-content:space-between; width:80%; font-size:0.6rem; margin-top:2px;">
-                        <span style="color:#00ffff;">${probA}%</span>
-                        <span style="color:#888;">${100-probA}%</span>
-                    </div>
-                </div>`;
+            cVs.innerHTML = `<div style="display:flex; flex-direction:column; align-items:center; width:100%;"><div style="font-size:0.6rem; color:#aaa; margin-bottom:2px;">WIN PROBABILITY</div><div style="display:flex; width:80%; height:4px; background:#333; border-radius:2px; overflow:hidden;"><div style="width:${probA}%; background:#00ffff; box-shadow:0 0 5px #00ffff;"></div><div style="width:${100-probA}%; background:#555;"></div></div><div style="display:flex; justify-content:space-between; width:80%; font-size:0.6rem; margin-top:2px;"><span style="color:#00ffff;">${probA}%</span><span style="color:#888;">${100-probA}%</span></div></div>`;
             row.appendChild(cVs);
-            
-            // スコアB
             const cSB = document.createElement("td"); cSB.className="score-cell";
             const sB = createScoreSelect(); sB.setAttribute('data-type','scoreB'); 
             if(currentScores[idx]) sB.value = currentScores[idx].b;
             cSB.appendChild(sB); row.appendChild(cSB);
-            
-            // ペアB
             const cTB = document.createElement("td"); cTB.textContent=`${pl[pat[2]]} & ${pl[pat[3]]}`; row.appendChild(cTB);
-            
-            // REST
             const cR = document.createElement("td"); cR.className="rest-highlight"; cR.textContent=pl[pat[4]]; row.appendChild(cR);
-            
             sA.onchange = () => checkWinner(sA, sB, cTA, cSA, cSB, cTB, rp);
             sB.onchange = () => checkWinner(sA, sB, cTA, cSA, cSB, cTB, rp);
             tb.appendChild(row);
@@ -1335,7 +1482,6 @@
         setTimeout(()=>{t.className=t.className.replace("show","")},3000);
     }
 
-    // --- AI Logic ---
     function getPlayerWinRate(name) {
         if(!playerStatsGlobal || !playerStatsGlobal[name]) return 0.5; 
         const p = playerStatsGlobal[name];
@@ -1366,7 +1512,6 @@
 
     function filterRanking(sector) {
         currentSector = sector;
-        // Selectボックスの場合はactiveクラスの切り替え不要（ブラウザ標準）
         processAnalysisData();
     }
 
@@ -1379,29 +1524,23 @@
             if (!row[0] || !row[3]) return;
             const rawName = String(row[3]);
             if(rawName.includes("undefined") || rawName.trim() === "") return;
-
             const court = row[1];
             if (currentSector !== 'ALL' && court !== currentSector) return;
-
             const dObj = new Date(row[0]);
             const y = dObj.getFullYear();
             const m = ('0' + (dObj.getMonth() + 1)).slice(-2);
             const day = ('0' + dObj.getDate()).slice(-2);
             const d = `${y}-${m}-${day}`;
-
             const rk = row[2];
             const nm = rawName.split(' (')[0];
             const w = parseInt(row[4]), l = parseInt(row[5]), g = parseInt(row[7]);
-
             mDates.add(d); totalG += g;
             if(!pStats[nm]) pStats[nm] = {name:nm, wins:0, losses:0, games:0, mvpCount:0, matches:0, history:[], sniperCount:0, clutchWins:0, clutchTotal:0};
             pStats[nm].wins += w; pStats[nm].losses += l; pStats[nm].games += g; pStats[nm].matches += (w+l);
             if(rk==1) pStats[nm].mvpCount++;
-
             const rt = (pStats[nm].wins + pStats[nm].losses) > 0 ? pStats[nm].wins/(pStats[nm].wins+pStats[nm].losses)*100 : 0;
             const hLog = pStats[nm].history.find(h=>h.date===d);
             if(hLog) hLog.rate = rt; else pStats[nm].history.push({date:d, rate:rt});
-
             const k = `${d}_${court}`;
             if(!logs[k]) logs[k] = {date:d, court:court, records:[]};
             logs[k].records.push({ rank:rk, name:nm, win:w, lose:l, rate:row[6], games:g });
@@ -1412,7 +1551,6 @@
         mRows.forEach(row => {
             const matchCourt = row[1];
             if (currentSector !== 'ALL' && matchCourt !== currentSector) return;
-
             const pA1=row[4], pA2=row[5], sA=parseInt(row[6]), sB=parseInt(row[7]), pB1=row[8], pB2=row[9];
             if(pA1==="-") return;
             const pairA = [pA1,pA2].sort().join(' & '); const pairB = [pB1,pB2].sort().join(' & ');
@@ -1420,7 +1558,6 @@
             pairStats[pairA].total++; pairStats[pairB].total++;
             if(sA > sB) { pairStats[pairA].wins++; pairStats[pairB].losses++; }
             else if(sB > sA) { pairStats[pairB].wins++; pairStats[pairA].losses++; }
-
             if(sA===4 && sB===0) { if(pStats[pA1]) pStats[pA1].sniperCount++; if(pStats[pA2]) pStats[pA2].sniperCount++; }
             if(sA===0 && sB===4) { if(pStats[pB1]) pStats[pB1].sniperCount++; if(pStats[pB2]) pStats[pB2].sniperCount++; }
             if(Math.abs(sA-sB)===1) {
@@ -1472,7 +1609,6 @@
         renderAnalysisPairs(pairStats);
         renderAnalysisLogs(logs);
         renderAnalysisChart(sortedP);
-
         if(currentSector === 'ALL') { updateSchedule('r1'); updateSchedule('r2'); }
     }
 
@@ -1502,17 +1638,14 @@
             const rate = (p.wins+p.losses)>0 ? ((p.wins/(p.wins+p.losses))*100).toFixed(1)+'%' : '-';
             const rk = getRankInfo(p.games).current;
             tr.onclick = () => showModal(p.name);
-            tr.innerHTML = `<td class="${i===0?'rank-1':''}">${i+1}</td>
-                <td style="text-align:left;padding-left:10px;"><span class="rank-icon">${rk.icon}</span> ${p.name} ${getMedals(p, playerStatsGlobal._max)}</td>
-                <td>${p.wins}</td><td>${rate}</td><td>${p.mvpCount}</td>`;
+            tr.innerHTML = `<td class="${i===0?'rank-1':''}">${i+1}</td><td style="text-align:left;padding-left:10px;"><span class="rank-icon">${rk.icon}</span> ${p.name} ${getMedals(p, playerStatsGlobal._max)}</td><td>${p.wins}</td><td>${rate}</td><td>${p.mvpCount}</td>`;
             tb.appendChild(tr);
         });
     }
 
     function renderAnalysisPairs(ps) {
         const tb = document.getElementById('pairRankingBody'); tb.innerHTML="";
-        const pairs = Object.entries(ps).map(([n,s])=>({name:n,...s})).filter(p=>p.total>=2)
-            .sort((a,b)=>{ const rA=a.wins/a.total, rB=b.wins/b.total; if(rA!==rB) return rB-rA; return a.wins-b.wins; });
+        const pairs = Object.entries(ps).map(([n,s])=>({name:n,...s})).filter(p=>p.total>=2).sort((a,b)=>{ const rA=a.wins/a.total, rB=b.wins/b.total; if(rA!==rB) return rB-rA; return a.wins-b.wins; });
         if(pairs.length===0) { tb.innerHTML='<tr><td colspan="4" class="no-data">データ不足 (2試合以上)</td></tr>'; return; }
         pairs.forEach((p,i)=>{
             const tr = document.createElement('tr');
@@ -1533,14 +1666,7 @@
             const sD = Object.values(ds).sort((a,b)=>{ const rA=(a.w+a.l)>0?a.w/(a.w+a.l):0; const rB=(b.w+b.l)>0?b.w/(b.w+b.l):0; if(rA!==rB) return rB-rA; return b.w-a.w; });
             const winner = sD.length > 0 ? sD[0].n : '-';
             const div = document.createElement('div'); div.className="log-item";
-            div.innerHTML = `
-                <div class="log-header" onclick="this.nextElementSibling.classList.toggle('open')">
-                    <div><span class="log-date">${l.date}</span><span class="log-court">@${l.court}</span></div>
-                    <div style="font-size:0.7rem;color:#aaa;">TOP: ${winner}</div>
-                </div>
-                <div class="log-content"><table class="standard-table"><thead><tr><th>順位</th><th>名前</th><th>勝敗</th><th>勝率</th></tr></thead><tbody>
-                ${sD.map((r,i)=>`<tr><td style="color:${i==0?'#fff':''}">${i+1}</td><td>${r.n}</td><td>${r.w}-${r.l}</td><td>${((r.w+r.l)>0?((r.w/(r.w+r.l))*100).toFixed(0)+'%':'-')}</td></tr>`).join('')}
-                </tbody></table></div>`;
+            div.innerHTML = `<div class="log-header" onclick="this.nextElementSibling.classList.toggle('open')"><div><span class="log-date">${l.date}</span><span class="log-court">@${l.court}</span></div><div style="font-size:0.7rem;color:#aaa;">TOP: ${winner}</div></div><div class="log-content"><table class="standard-table"><thead><tr><th>順位</th><th>名前</th><th>勝敗</th><th>勝率</th></tr></thead><tbody>${sD.map((r,i)=>`<tr><td style="color:${i==0?'#fff':''}">${i+1}</td><td>${r.n}</td><td>${r.w}-${r.l}</td><td>${((r.w+r.l)>0?((r.w/(r.w+r.l))*100).toFixed(0)+'%':'-')}</td></tr>`).join('')}</tbody></table></div>`;
             c.appendChild(div);
         });
     }
@@ -1551,31 +1677,8 @@
         const tops = players.slice(0,5);
         new Chart(ctx, {
             type: 'bar',
-            data: {
-                labels: tops.map(p=>p.name),
-                datasets: [{ label:'勝率 (%)', data: tops.map(p=>(p.wins+p.losses)>0?p.wins/(p.wins+p.losses)*100:0), backgroundColor:'rgba(255,255,255,0.1)', borderColor:'#fff', borderWidth:1 }]
-            },
-            options: { 
-                responsive:true, 
-                maintainAspectRatio:false, 
-                scales:{y:{beginAtZero:true,max:100,grid:{color:'rgba(255,255,255,0.05)'}},x:{grid:{display:false}}},
-                plugins: {
-                    tooltip: {
-                        callbacks: {
-                            label: function(context) {
-                                let label = context.dataset.label || '';
-                                if (label) {
-                                    label += ': ';
-                                }
-                                if (context.parsed.y !== null) {
-                                    label += context.parsed.y.toFixed(1) + '%';
-                                }
-                                return label;
-                            }
-                        }
-                    }
-                }
-            }
+            data: { labels: tops.map(p=>p.name), datasets: [{ label:'勝率 (%)', data: tops.map(p=>(p.wins+p.losses)>0?p.wins/(p.wins+p.losses)*100:0), backgroundColor:'rgba(255,255,255,0.1)', borderColor:'#fff', borderWidth:1 }] },
+            options: { responsive:true, maintainAspectRatio:false, scales:{y:{beginAtZero:true,max:100,grid:{color:'rgba(255,255,255,0.05)'}},x:{grid:{display:false}}}, plugins: { tooltip: { callbacks: { label: function(context) { return (context.dataset.label||'') + ': ' + (context.parsed.y!==null?context.parsed.y.toFixed(1)+'%':''); } } } } }
         });
     }
 
@@ -1583,7 +1686,6 @@
         const p = playerStatsGlobal[name]; const max = playerStatsGlobal._max; if(!p) return;
         document.getElementById('modalPlayerName').textContent = p.name;
         document.getElementById('modalMedals').innerHTML = getMedals(p, max);
-        
         const ri = getRankInfo(p.games);
         let barW = 100, txt = "MAX RANK";
         if(ri.next) {
@@ -1592,61 +1694,16 @@
             barW = Math.min((cur/range)*100, 100);
             txt = `経験値: ${p.games} / ${ri.next.min} (次: ${ri.next.name})`;
         } else { txt = `経験値: ${p.games} (提督)`; }
-        
-        document.getElementById('rankInfoArea').innerHTML = `
-            <div class="rank-name">${ri.current.name} <span>${ri.current.icon}</span></div>
-            <div class="rank-progress-text">${txt}</div>
-            <div class="rank-bar-bg"><div class="rank-bar-fill" style="width:${barW}%"></div></div>`;
-        
+        document.getElementById('rankInfoArea').innerHTML = `<div class="rank-name">${ri.current.name} <span>${ri.current.icon}</span></div><div class="rank-progress-text">${txt}</div><div class="rank-bar-bg"><div class="rank-bar-fill" style="width:${barW}%"></div></div>`;
         document.getElementById('playerModal').style.display = 'flex';
-
         const ctxR = document.getElementById('radarChart').getContext('2d');
         if(radarChartInstance) radarChartInstance.destroy();
-        
-        // 【修正 21】 Safe Calculation & Fixed Scale
         const safeCalc = (val, maxVal) => maxVal > 0 ? (val / maxVal) * 100 : 0;
-
         radarChartInstance = new Chart(ctxR, {
             type: 'radar',
-            data: {
-                labels: ['勝率', '勝利', 'MVP', '試合数', 'ゲーム'],
-                datasets: [{ 
-                    label: '能力値', 
-                    data: [
-                        p.wins + p.losses > 0 ? (p.wins/(p.wins+p.losses)*100) : 0, 
-                        safeCalc(p.wins, max.wins), 
-                        safeCalc(p.mvpCount, max.mvpCount), 
-                        safeCalc(p.matches, max.matches), 
-                        safeCalc(p.games, max.games)
-                    ], 
-                    backgroundColor:'rgba(0,255,255,0.2)', borderColor:'#00ffff', borderWidth:2 
-                }]
-            },
-            options: { 
-                responsive:true, 
-                maintainAspectRatio:false, 
-                scales:{
-                    r:{
-                        angleLines:{color:'rgba(255,255,255,0.2)'}, 
-                        grid:{color:'rgba(255,255,255,0.2)'}, 
-                        pointLabels:{color:'#00ffff',font:{size:9}}, 
-                        ticks:{display:false}, // Hide numbers
-                        min: 0, // Fixed min
-                        max: 100 // Fixed max for everyone
-                    }
-                },
-                plugins: {
-                    tooltip: {
-                        callbacks: {
-                            label: function(context) {
-                                return context.dataset.label + ': ' + context.raw.toFixed(1);
-                            }
-                        }
-                    }
-                }
-            } 
+            data: { labels: ['勝率', '勝利', 'MVP', '試合数', 'ゲーム'], datasets: [{ label: '能力値', data: [ p.wins + p.losses > 0 ? (p.wins/(p.wins+p.losses)*100) : 0, safeCalc(p.wins, max.wins), safeCalc(p.mvpCount, max.mvpCount), safeCalc(p.matches, max.matches), safeCalc(p.games, max.games) ], backgroundColor:'rgba(0,255,255,0.2)', borderColor:'#00ffff', borderWidth:2 }] },
+            options: { responsive:true, maintainAspectRatio:false, scales:{ r:{ angleLines:{color:'rgba(255,255,255,0.2)'}, grid:{color:'rgba(255,255,255,0.2)'}, pointLabels:{color:'#00ffff',font:{size:9}}, ticks:{display:false}, min: 0, max: 100 } }, plugins: { tooltip: { callbacks: { label: function(context) { return context.dataset.label + ': ' + context.raw.toFixed(1); } } } } } 
         });
-
         const ctxH = document.getElementById('historyChart').getContext('2d');
         if(historyChartInstance) historyChartInstance.destroy();
         const hist = p.history.sort((a,b)=>new Date(a.date)-new Date(b.date));
