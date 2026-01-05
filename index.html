@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CODE NAME: 30</title>
+    <title>CODE NAME: 31</title>
     <link rel="manifest" href="manifest.json">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black">
@@ -71,19 +71,19 @@
             margin-top: 5px;
         }
         
-        /* HAMBURGER MENU (Updated Position & Size) */
+        /* HAMBURGER MENU (Updated: Right Side, Smaller) */
         .hamburger-btn {
             position: fixed;
             top: 15px;
-            right: 15px; /* Moved to Right */
+            right: 15px;
             z-index: 4001;
             background: rgba(0,0,0,0.6);
             border: 1px solid rgba(0,255,255,0.5);
             border-radius: 4px;
-            padding: 6px; /* Slightly reduced padding */
+            padding: 5px; /* Smaller padding */
             cursor: pointer;
-            width: 32px; /* Smaller size (was 40px) */
-            height: 32px; /* Smaller size (was 40px) */
+            width: 28px; /* Smaller size (was 32px) */
+            height: 28px; /* Smaller size (was 32px) */
             display: flex;
             flex-direction: column;
             justify-content: space-around;
@@ -91,7 +91,7 @@
             box-shadow: 0 0 10px rgba(0,255,255,0.2);
         }
         .hamburger-bar {
-            width: 18px; /* Smaller bar width (was 24px) */
+            width: 16px; /* Smaller bar width (was 18px) */
             height: 2px;
             background-color: #00ffff;
             box-shadow: 0 0 5px #00ffff;
@@ -107,6 +107,7 @@
             backdrop-filter: blur(10px);
             z-index: 4000;
             display: none;
+            justify-content: flex-end; /* Align content to right */
             opacity: 0;
             transition: opacity 0.3s;
         }
@@ -119,11 +120,11 @@
             max-width: 300px;
             height: 100%;
             background: rgba(10, 15, 20, 0.95);
-            border-right: 1px solid rgba(0,255,255,0.3);
+            border-left: 1px solid rgba(0,255,255,0.3); /* Changed to Left Border */
             padding-top: 80px;
             display: flex;
             flex-direction: column;
-            transform: translateX(-100%);
+            transform: translateX(100%); /* Slide from Right */
             transition: transform 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
         }
         .side-menu-overlay.open .side-menu-content {
@@ -888,6 +889,7 @@
             <select id="mapSectorSelect" class="sector-select" onchange="renderMapInfo(this.value)">
                 <option value="-">SELECT SECTOR</option>
                 <option value="MOGUSA">百草テニスガーデン</option>
+                <option value="NERIMA">練馬ステップイン</option>
             </select>
         </div>
         <div id="mapContainer">
@@ -1031,6 +1033,7 @@
     let radarChartInstance = null;
     let historyChartInstance = null;
     let winRateChartInstance = null;
+    let currentCourtCost = 4500;
     
     let rawAnalysisRankings = [];
     let rawAnalysisMatches = [];
@@ -1066,13 +1069,18 @@
         const pageTitle = document.getElementById('pageTitle');
         const subTitle = document.querySelector('.subtitle');
 
+        const items = document.querySelectorAll('.side-menu-content .menu-item');
+        items.forEach(item => item.classList.remove('active'));
+
         if (mode === 'tennis') {
+            items[0].classList.add('active');
             // Show Tennis Views
             switchMainView('match'); // Default to match input
             bottomNav.classList.remove('hidden');
             pageTitle.textContent = "TENNIS CHRONICLES";
             subTitle.textContent = "DEEP SPACE INTEGRATED SYSTEM";
         } else if (mode === 'game') {
+            items[1].classList.add('active');
             // Show Game Portal
             document.querySelectorAll('.view-section').forEach(sec => sec.classList.remove('active'));
             document.getElementById('view-game').classList.add('active');
@@ -1131,7 +1139,18 @@
             address: "〒191-0033 東京都日野市百草878−1",
             tel: "042-591-1212",
             hours: "9:00～18:00",
+            costStr: "¥4,500/h",
+            costVal: 4500,
             mapSrc: "https://googleusercontent.com/maps.google.com/5"
+        },
+        "NERIMA": {
+            name: "練馬ステップイン",
+            address: "〒177-0035 東京都練馬区南田中1丁目15−22",
+            tel: "03-3904-7051",
+            hours: "9:00～21:30",
+            costStr: "¥4,000/h",
+            costVal: 4000,
+            mapSrc: ""
         }
     };
 
@@ -1142,7 +1161,8 @@
             c.innerHTML = `<div class="empty-map-state"><div class="spinning" style="display:inline-block; margin-bottom:10px;">❖</div><br>WAITING FOR NAVI INPUT...</div>`;
             return;
         }
-        const displayAddress = "〒191-0033<br>東京都日野市百草878−1";
+        currentCourtCost = data.costVal;
+        const displayAddress = data.address.replace(" ", "<br>");
         c.innerHTML = `
             <div class="info-card" style="margin-top:20px;">
                 <div class="info-row"><div class="info-label">SECTOR</div><div class="info-val" style="color:#00ffff; font-weight:bold;">${data.name}</div></div>
@@ -1152,21 +1172,22 @@
                 </div>
                 <div class="info-row"><div class="info-label">TEL</div><div class="info-val"><a href="tel:${data.tel}" style="color:#fff;text-decoration:none;">${data.tel}</a></div></div>
                 <div class="info-row"><div class="info-label">HOURS</div><div class="info-val">${data.hours}</div></div>
-                <div class="info-row"><div class="info-label">COST</div><div class="info-val">¥4,500/h</div></div>
+                <div class="info-row"><div class="info-label">COST</div><div class="info-val">${data.costStr}</div></div>
                 <div style="margin-top:15px; padding-top:15px; border-top:1px dashed rgba(255,255,255,0.2);">
                     <div style="font-size:0.75rem; color:#00ffff; margin-bottom:5px; letter-spacing:1px;">SPLIT CALCULATOR</div>
                     <div style="display:flex; align-items:center; gap:8px; font-size:0.9rem;">
                         COST × <select id="calcHours" onchange="calcSplit()" style="background:rgba(0,0,0,0.5); color:#fff; border:1px solid #555; padding:4px; border-radius:4px;"><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option><option value="7">7</option><option value="8">8</option><option value="9">9</option></select>
                         ÷ <select id="calcMembers" onchange="calcSplit()" style="background:rgba(0,0,0,0.5); color:#fff; border:1px solid #555; padding:4px; border-radius:4px;"><option value="4">4</option><option value="5">5</option><option value="6">6</option></select>
-                        = <span id="calcResult" style="color:#00ffff; font-weight:bold; font-size:1.1rem; margin-left:5px;">¥3,375</span>
+                        = <span id="calcResult" style="color:#00ffff; font-weight:bold; font-size:1.1rem; margin-left:5px;">-</span>
                     </div>
                 </div>
             </div>`;
+            calcSplit();
     }
 
     function copyToClipboard(text) { navigator.clipboard.writeText(text).then(() => { showToast("ADDRESS COPIED"); }); }
     function calcSplit() {
-        const cost = 4500;
+        const cost = currentCourtCost;
         const members = parseInt(document.getElementById('calcMembers').value);
         const hours = parseInt(document.getElementById('calcHours').value);
         const result = Math.ceil((cost * hours) / members);
