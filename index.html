@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>日程回答</title>
+<script charset="utf-8" src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
 <style>
   :root {
     --bg-color: #ffffff;
@@ -22,7 +23,7 @@
     margin: 0;
     padding: 0;
     color: var(--text-color);
-    padding-bottom: 80px;
+    padding-bottom: 90px;
   }
 
   /* ヘッダー */
@@ -32,6 +33,21 @@
     font-weight: bold; font-size: 1rem; position: sticky; top: 0; background: #fff; z-index: 10;
   }
   .header-icon { font-size: 1.2rem; color: #333; cursor: pointer; width: 24px; text-align: center; }
+
+  /* ユーザー情報表示バー */
+  .user-bar {
+    background-color: #f2f4f8;
+    padding: 8px 15px;
+    font-size: 0.85rem;
+    color: #555;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .user-name-display {
+    font-weight: bold;
+    color: var(--line-green);
+  }
 
   /* イベント情報 */
   .event-info {
@@ -49,43 +65,29 @@
 
   /* 月切り替えタブ */
   .month-tabs {
-    display: flex;
-    gap: 10px;
-    padding: 15px 15px 0 15px;
-    background: #fff;
-    border-bottom: 8px solid #f2f4f8;
-    overflow-x: auto;
+    display: flex; gap: 10px; padding: 15px 15px 0 15px;
+    background: #fff; border-bottom: 8px solid #f2f4f8; overflow-x: auto;
   }
   .tab-btn {
-    padding: 8px 16px;
-    border-radius: 20px;
-    background-color: #f0f0f0;
-    color: #666;
-    font-size: 0.9rem;
-    font-weight: bold;
-    cursor: pointer;
-    white-space: nowrap;
-    user-select: none;
-    margin-bottom: 15px;
-    transition: all 0.2s;
+    padding: 8px 16px; border-radius: 20px; background-color: #f0f0f0; color: #666;
+    font-size: 0.9rem; font-weight: bold; cursor: pointer; white-space: nowrap;
+    user-select: none; margin-bottom: 15px; transition: all 0.2s;
   }
   .tab-btn.active {
-    background-color: var(--line-green);
-    color: white;
+    background-color: var(--line-green); color: white;
     box-shadow: 0 2px 4px rgba(6, 199, 85, 0.3);
   }
 
   /* 日程リスト */
   .date-list { list-style: none; padding: 0; margin: 0; }
-  
   .date-item {
     display: flex; justify-content: space-between; align-items: center;
     padding: 18px 15px; border-bottom: 1px solid var(--border-color);
   }
   .date-item.hidden { display: none; }
-
   .date-text { font-size: 0.95rem; }
 
+  /* ラジオボタン */
   .options-group { display: flex; gap: 20px; }
   .option-label {
     cursor: pointer; display: flex; justify-content: center; align-items: center;
@@ -98,9 +100,11 @@
   .comment-section { padding: 15px; border-top: 1px solid var(--border-color); }
   .comment-input { width: 100%; border: none; font-size: 0.95rem; outline: none; resize: none; font-family: inherit; }
   
+  /* フッター */
   .footer {
     position: fixed; bottom: 0; left: 0; width: 100%; background-color: #f9f9f9;
     padding: 10px 15px 25px; border-top: 1px solid #e0e0e0; box-sizing: border-box;
+    z-index: 20;
   }
   .submit-btn {
     width: 100%; background-color: var(--btn-disabled); color: var(--btn-text-disabled);
@@ -120,6 +124,10 @@
     <div class="header-icon">✕</div>
   </header>
 
+  <div class="user-bar">
+    <span>ログイン中: <span id="loginName" class="user-name-display">読み込み中...</span></span>
+  </div>
+
   <div class="event-info">
     <div class="calendar-icon">
       <svg viewBox="0 0 24 24"><path d="M19 4h-1V2h-2v2H8V2H6v2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V10h14v10zm0-12H5V6h14v2z"/></svg>
@@ -133,7 +141,7 @@
   <div class="month-tabs" id="monthTabs"></div>
 
   <form id="schedule-form">
-    <div id="loading">日程を読み込み中...</div>
+    <div id="loading">LIFF認証 & 日程読み込み中...</div>
     <ul class="date-list" id="dateList"></ul>
 
     <div class="comment-section">
@@ -146,18 +154,46 @@
   </footer>
 
 <script>
-  // ▼ 更新した新しいGASのURLです
+  // ▼ ID設定済み（ここがズレているとテスト太郎になります）
+  const LIFF_ID = "2008858372-NgwrDQlQ";
   const GAS_URL = "https://script.google.com/macros/s/AKfycbxkywDklSyaMf93hYhG-ULAyAEQ1qHGgaYjNewTxX34pfySOZKYsbwehygCccEvnchB/exec";
   
-  const MY_NAME = "テスト太郎";
+  let myLineName = "";
 
   const dateListUl = document.getElementById('dateList');
   const monthTabsDiv = document.getElementById('monthTabs');
   const eventTitle = document.getElementById('eventTitle');
   const loadingDiv = document.getElementById('loading');
   const btn = document.getElementById('submitBtn');
+  const loginNameSpan = document.getElementById('loginName');
 
   window.onload = function() {
+    initializeLiff();
+  };
+
+  async function initializeLiff() {
+    try {
+      await liff.init({ liffId: LIFF_ID });
+
+      if (!liff.isLoggedIn()) {
+        liff.login();
+        return;
+      }
+
+      const profile = await liff.getProfile();
+      myLineName = profile.displayName;
+      
+      loginNameSpan.innerText = myLineName;
+      fetchSchedule();
+
+    } catch (err) {
+      console.error('LIFF Error:', err);
+      // エラー時はここに入ります
+      loadingDiv.innerHTML = "エラーが発生しました。<br>LINEから開いていますか？";
+    }
+  }
+
+  function fetchSchedule() {
     fetch(GAS_URL)
       .then(response => response.json())
       .then(data => {
@@ -166,9 +202,9 @@
       })
       .catch(error => {
         console.error(error);
-        loadingDiv.innerHTML = "読み込みエラー<br>URLが正しいか確認してください";
+        loadingDiv.innerHTML = "日程の読み込みに失敗しました";
       });
-  };
+  }
 
   function initApp(data) {
     if (data.length === 0) {
@@ -176,11 +212,8 @@
       return;
     }
 
-    // 月ごとにユニークなキーを抽出 (例: "2026-01", "2026-02")
-    // data.fullDate はGAS側で日本時間に修正済み (yyyy-MM-dd)
     const uniqueMonths = [...new Set(data.map(item => item.fullDate.substring(0, 7)))];
     
-    // タブボタン作成
     uniqueMonths.forEach((monthKey, index) => {
       const monthNum = parseInt(monthKey.split('-')[1]); 
       const btn = document.createElement('div');
@@ -188,7 +221,6 @@
       btn.innerText = `${monthNum}月`;
       btn.onclick = () => switchMonth(monthKey, monthNum);
       
-      // 最初だけアクティブに
       if (index === 0) {
         btn.classList.add('active');
         updateTitle(monthNum);
@@ -196,14 +228,11 @@
       monthTabsDiv.appendChild(btn);
     });
 
-    // リスト描画（最初は先頭の月だけ表示）
     generateList(data, uniqueMonths[0]);
   }
 
   function switchMonth(targetMonthKey, monthNum) {
     updateTitle(monthNum);
-
-    // タブの見た目更新
     const tabs = document.querySelectorAll('.tab-btn');
     tabs.forEach(tab => {
       if (tab.innerText === `${monthNum}月`) {
@@ -212,8 +241,6 @@
         tab.classList.remove('active');
       }
     });
-
-    // リストの表示/非表示切り替え
     const items = document.querySelectorAll('.date-item');
     items.forEach(item => {
       const itemMonth = item.getAttribute('data-month');
@@ -233,23 +260,15 @@
     scheduleData.forEach((item, index) => {
       const groupName = `day_${index}`;
       const monthKey = item.fullDate.substring(0, 7);
-      
-      // 初期表示月以外は隠す
       const hiddenClass = (monthKey === initialMonthKey) ? '' : 'hidden';
 
       const html = `
         <li class="date-item ${hiddenClass}" data-month="${monthKey}">
           <span class="date-text">${item.date}</span>
           <div class="options-group">
-            <label class="option-label">
-              <input type="radio" name="${groupName}" value="ok" data-date="${item.date}">◯
-            </label>
-            <label class="option-label">
-              <input type="radio" name="${groupName}" value="maybe" data-date="${item.date}">△
-            </label>
-            <label class="option-label">
-              <input type="radio" name="${groupName}" value="ng" data-date="${item.date}">✕
-            </label>
+            <label class="option-label"><input type="radio" name="${groupName}" value="ok" data-date="${item.date}">◯</label>
+            <label class="option-label"><input type="radio" name="${groupName}" value="maybe" data-date="${item.date}">△</label>
+            <label class="option-label"><input type="radio" name="${groupName}" value="ng" data-date="${item.date}">✕</label>
           </div>
         </li>
       `;
@@ -258,12 +277,18 @@
 
     document.getElementById('schedule-form').addEventListener('change', () => {
       btn.classList.add('active');
+      btn.innerText = `${myLineName} として回答`;
     });
   }
 
   function sendData() {
     const activeBtn = document.querySelector('.submit-btn.active');
     if (!activeBtn) return;
+
+    if (!myLineName) {
+      alert("LINEログイン情報が取得できていません。");
+      return;
+    }
 
     btn.innerText = "送信中...";
     btn.disabled = true;
@@ -277,7 +302,7 @@
       if (checkedInput) {
         const dateStr = checkedInput.getAttribute('data-date');
         const payload = {
-          userName: MY_NAME,
+          userName: myLineName,
           date: dateStr,
           status: checkedInput.value,
           comment: comment
@@ -303,11 +328,11 @@
     Promise.all(sendPromises)
       .then(() => {
         alert("登録しました！");
-        btn.innerText = "送信完了";
+        liff.closeWindow(); 
       })
       .catch(error => {
         alert("送信処理完了");
-        btn.innerText = "送信完了";
+        liff.closeWindow();
       });
   }
 </script>
