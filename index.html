@@ -148,9 +148,12 @@
   </footer>
 
 <script>
-  // あなたの設定
+  // ============================================
+  // ▼ ここに新しいGASのURLを貼り付けてください！
+  const GAS_URL = "https://script.google.com/macros/s/AKfycbythu55Dpx_6sgwJfQLODlU-FI7OQFjXrrPxvizVQR3vukXgnpKOLHu35z9KTyh-Dra/exec"; 
+  // ▼ 自分のLIFF IDをここに入れます
   const LIFF_ID = "2008858372-NgwrDQlQ";
-  const GAS_URL = "https://script.google.com/macros/s/AKfycbz5I2fkM_YjYnhCkem7MC2R5IuXmdtbQe0fEGZCHBFBhR3-XuTAehO49qHSF7sgl1w/exec";
+  // ============================================
   
   let myLineName = "";
 
@@ -177,7 +180,7 @@
       myLineName = profile.displayName;
       loginNameSpan.innerText = myLineName;
       
-      // 日程読み込み開始
+      // 1. まず日程枠（カレンダー）を読み込む
       fetchSchedule();
 
     } catch (err) {
@@ -192,7 +195,7 @@
       .then(response => response.json())
       .then(data => {
         initApp(data);
-        // カレンダー枠ができたら、次に「自分の過去の回答」を取りに行く
+        // 2. カレンダー枠ができたら、次に「自分の過去の回答」を取りに行く
         fetchMyHistory();
       })
       .catch(error => {
@@ -379,4 +382,3 @@
 
 </body>
 </html>
-
