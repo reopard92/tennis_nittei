@@ -15,8 +15,8 @@
     --line-green: #06c755;
     
     /* 曜日カラー */
-    --sat-color: #0066cc; /* 土曜の青 */
-    --sun-color: #cc0000; /* 日祝の赤 */
+    --sat-color: #0066cc;
+    --sun-color: #cc0000;
 
     /* 選択時のカラー */
     --ok-bg: #28a745;
@@ -32,14 +32,10 @@
     padding-bottom: 90px;
   }
 
-  /* ヘッダー（シンプル化） */
   .header {
-    display: flex; justify-content: center; /* 中央寄せ */
-    align-items: center;
-    height: 44px;
-    border-bottom: 1px solid var(--border-color);
-    font-weight: bold; font-size: 1rem;
-    position: sticky; top: 0; background: #fff; z-index: 10;
+    display: flex; justify-content: center; align-items: center;
+    height: 44px; border-bottom: 1px solid var(--border-color);
+    font-weight: bold; font-size: 1rem; position: sticky; top: 0; background: #fff; z-index: 10;
   }
 
   .user-bar {
@@ -55,7 +51,6 @@
   }
   .calendar-icon svg { width: 24px; height: 24px; fill: white; }
   .event-details h2 { font-size: 1rem; margin: 0; }
-  /* 管理者表示は削除しました */
 
   .month-tabs {
     display: flex; gap: 10px; padding: 15px 15px 0 15px;
@@ -79,21 +74,18 @@
   .date-item.hidden { display: none; }
   
   .date-text { font-size: 1rem; font-weight: 500; }
-  /* 曜日の色付け用クラス */
   .sat { color: var(--sat-color); }
   .sun { color: var(--sun-color); }
 
-  /* ラジオボタンのデザイン変更 */
   .options-group { display: flex; gap: 15px; }
   .option-label {
     cursor: pointer; display: flex; justify-content: center; align-items: center;
     width: 36px; height: 36px; border-radius: 50%; transition: all 0.2s;
     color: #ccc; font-size: 1.2rem; font-weight: bold;
-    background-color: #f9f9f9; /* 未選択時の薄い背景 */
+    background-color: #f9f9f9;
   }
   .option-label input { display: none; }
 
-  /* 選択時のスタイル（背景色変更） */
   .option-label:has(input[value="ok"]:checked) {
     background-color: var(--ok-bg); color: white; transform: scale(1.1); box-shadow: 0 2px 5px rgba(40, 167, 69, 0.3);
   }
@@ -156,6 +148,7 @@
   </footer>
 
 <script>
+  // あなたの設定
   const LIFF_ID = "2008858372-NgwrDQlQ";
   const GAS_URL = "https://script.google.com/macros/s/AKfycbxkywDklSyaMf93hYhG-ULAyAEQ1qHGgaYjNewTxX34pfySOZKYsbwehygCccEvnchB/exec";
   
@@ -167,6 +160,7 @@
   const loadingDiv = document.getElementById('loading');
   const btn = document.getElementById('submitBtn');
   const loginNameSpan = document.getElementById('loginName');
+  const userComment = document.getElementById('userComment');
 
   window.onload = function() {
     initializeLiff();
@@ -182,24 +176,82 @@
       const profile = await liff.getProfile();
       myLineName = profile.displayName;
       loginNameSpan.innerText = myLineName;
+      
+      // 日程読み込み開始
       fetchSchedule();
+
     } catch (err) {
       console.error('LIFF Error:', err);
       loadingDiv.innerHTML = "エラーが発生しました。<br>LINEから開いていますか？";
     }
   }
 
+  // 1. カレンダー枠の取得
   function fetchSchedule() {
     fetch(GAS_URL)
       .then(response => response.json())
       .then(data => {
-        loadingDiv.style.display = 'none';
         initApp(data);
+        // カレンダー枠ができたら、次に「自分の過去の回答」を取りに行く
+        fetchMyHistory();
       })
       .catch(error => {
         console.error(error);
         loadingDiv.innerHTML = "日程の読み込みに失敗しました";
       });
+  }
+
+  // 2. 自分の回答履歴の取得
+  function fetchMyHistory() {
+    // GASに「?mode=history&name=自分」で問い合わせる
+    const historyUrl = `${GAS_URL}?mode=history&name=${encodeURIComponent(myLineName)}`;
+    
+    fetch(historyUrl)
+      .then(res => res.json())
+      .then(history => {
+        loadingDiv.style.display = 'none'; // ロード完了
+        applyHistory(history);
+      })
+      .catch(err => {
+        console.error("履歴取得エラー:", err);
+        loadingDiv.style.display = 'none'; // エラーでも画面は出す
+      });
+  }
+
+  // 3. 画面に履歴を反映させる
+  function applyHistory(history) {
+    if (!history || Object.keys(history).length === 0) return;
+
+    // 画面上の全日程をループしてチェックを入れる
+    const items = document.querySelectorAll('.date-item');
+    let hasData = false;
+    let lastComment = "";
+
+    items.forEach(item => {
+      // ラジオボタンのどれか1つから日付(data-date)を取得
+      const radio = item.querySelector('input');
+      const dateStr = radio.getAttribute('data-date');
+      
+      // 履歴の中にこの日付のデータがあるか？
+      if (history[dateStr]) {
+        const status = history[dateStr].status; // ok, maybe, ng
+        const comment = history[dateStr].comment;
+        
+        // そのステータスのラジオボタンを探してチェックする
+        const targetRadio = item.querySelector(`input[value="${status}"]`);
+        if (targetRadio) {
+          targetRadio.checked = true;
+          hasData = true;
+        }
+        if (comment) lastComment = comment;
+      }
+    });
+
+    if (hasData) {
+      btn.innerText = "更新する"; // 既にデータがあればボタン名を変える
+      btn.classList.add('active'); // ボタン有効化
+      if (lastComment) userComment.value = lastComment;
+    }
   }
 
   function initApp(data) {
@@ -248,14 +300,10 @@
       const monthKey = item.fullDate.substring(0, 7);
       const hiddenClass = (monthKey === initialMonthKey) ? '' : 'hidden';
 
-      // ■ 曜日の色分け処理
-      // GASからは "01.10(土)" のように来る想定
-      // (土)が含まれていれば青、そうでなければ(日祝とみなして)赤にする
       let formattedDate = item.date;
       if (item.date.includes('(土)')) {
         formattedDate = item.date.replace('(土)', '<span class="sat">(土)</span>');
       } else {
-        // (日)や(月)などの祝日分を赤にする
         formattedDate = item.date.replace(/(\(.\))/, '<span class="sun">$1</span>');
       }
 
@@ -319,7 +367,7 @@
 
     Promise.all(sendPromises)
       .then(() => {
-        alert("登録しました！");
+        alert("登録(更新)しました！");
         liff.closeWindow(); 
       })
       .catch(error => {
