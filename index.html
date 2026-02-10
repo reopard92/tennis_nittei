@@ -111,43 +111,6 @@
   .submit-btn.active { background-color: var(--line-green); color: white; }
 
   #loading { padding: 30px; text-align: center; color: #888; font-size: 0.9rem; }
-
-  /* ▼▼▼ 追加：送信中ポップアップのスタイル ▼▼▼ */
-  .popup-overlay {
-    display: none; /* 最初は隠す */
-    position: fixed;
-    top: 0; left: 0;
-    width: 100%; height: 100%;
-    background: rgba(0, 0, 0, 0.5); /* 半透明の黒背景 */
-    z-index: 1000;
-    justify-content: center;
-    align-items: center;
-  }
-  .popup-overlay.show {
-    display: flex; /* showクラスがつくと表示 */
-  }
-  .popup-content {
-    background: white;
-    padding: 25px;
-    border-radius: 12px;
-    text-align: center;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-    width: 80%;
-    max-width: 300px;
-  }
-  .spinner {
-    border: 4px solid #f3f3f3;
-    border-top: 4px solid var(--line-green);
-    border-radius: 50%;
-    width: 30px; height: 30px;
-    animation: spin 1s linear infinite;
-    margin: 0 auto 15px auto;
-  }
-  .popup-text { font-weight: bold; font-size: 1.1rem; margin-bottom: 5px; }
-  .popup-subtext { font-size: 0.85rem; color: #666; }
-  
-  @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-  /* ▲▲▲ 追加ここまで ▲▲▲ */
 </style>
 </head>
 <body>
@@ -184,16 +147,10 @@
     <button class="submit-btn" id="submitBtn" onclick="sendData()">選択</button>
   </footer>
 
-  <div id="sendingPopup" class="popup-overlay">
-    <div class="popup-content">
-      <div class="spinner"></div>
-      <div class="popup-text">送信中...</div>
-      <div class="popup-subtext">完了するまで<br>しばらくお待ちください</div>
-    </div>
-  </div>
-  <script>
+<script>
+  // あなたの設定
   const LIFF_ID = "2008858372-NgwrDQlQ";
-  const GAS_URL = "https://script.google.com/macros/s/AKfycbz1L2fazYS9Rc0-1fDUtOh5LDh7PizsG3mNe2iEX6B4DMU7BmPdRZFzMJMDvmkW5PAj/exec";
+  const GAS_URL = "https://script.google.com/macros/s/AKfycbxkywDklSyaMf93hYhG-ULAyAEQ1qHGgaYjNewTxX34pfySOZKYsbwehygCccEvnchB/exec";
   
   let myLineName = "";
 
@@ -204,7 +161,6 @@
   const btn = document.getElementById('submitBtn');
   const loginNameSpan = document.getElementById('loginName');
   const userComment = document.getElementById('userComment');
-  const sendingPopup = document.getElementById('sendingPopup'); // ポップアップ用
 
   window.onload = function() {
     initializeLiff();
@@ -220,18 +176,23 @@
       const profile = await liff.getProfile();
       myLineName = profile.displayName;
       loginNameSpan.innerText = myLineName;
+      
+      // 日程読み込み開始
       fetchSchedule();
+
     } catch (err) {
       console.error('LIFF Error:', err);
       loadingDiv.innerHTML = "エラーが発生しました。<br>LINEから開いていますか？";
     }
   }
 
+  // 1. カレンダー枠の取得
   function fetchSchedule() {
     fetch(GAS_URL)
       .then(response => response.json())
       .then(data => {
         initApp(data);
+        // カレンダー枠ができたら、次に「自分の過去の回答」を取りに行く
         fetchMyHistory();
       })
       .catch(error => {
@@ -240,32 +201,43 @@
       });
   }
 
+  // 2. 自分の回答履歴の取得
   function fetchMyHistory() {
+    // GASに「?mode=history&name=自分」で問い合わせる
     const historyUrl = `${GAS_URL}?mode=history&name=${encodeURIComponent(myLineName)}`;
+    
     fetch(historyUrl)
       .then(res => res.json())
       .then(history => {
-        loadingDiv.style.display = 'none';
+        loadingDiv.style.display = 'none'; // ロード完了
         applyHistory(history);
       })
       .catch(err => {
         console.error("履歴取得エラー:", err);
-        loadingDiv.style.display = 'none';
+        loadingDiv.style.display = 'none'; // エラーでも画面は出す
       });
   }
 
+  // 3. 画面に履歴を反映させる
   function applyHistory(history) {
     if (!history || Object.keys(history).length === 0) return;
+
+    // 画面上の全日程をループしてチェックを入れる
     const items = document.querySelectorAll('.date-item');
     let hasData = false;
     let lastComment = "";
 
     items.forEach(item => {
+      // ラジオボタンのどれか1つから日付(data-date)を取得
       const radio = item.querySelector('input');
       const dateStr = radio.getAttribute('data-date');
+      
+      // 履歴の中にこの日付のデータがあるか？
       if (history[dateStr]) {
-        const status = history[dateStr].status;
+        const status = history[dateStr].status; // ok, maybe, ng
         const comment = history[dateStr].comment;
+        
+        // そのステータスのラジオボタンを探してチェックする
         const targetRadio = item.querySelector(`input[value="${status}"]`);
         if (targetRadio) {
           targetRadio.checked = true;
@@ -276,8 +248,8 @@
     });
 
     if (hasData) {
-      btn.innerText = "更新する";
-      btn.classList.add('active');
+      btn.innerText = "更新する"; // 既にデータがあればボタン名を変える
+      btn.classList.add('active'); // ボタン有効化
       if (lastComment) userComment.value = lastComment;
     }
   }
@@ -359,10 +331,8 @@
     if (!activeBtn) return;
     if (!myLineName) { alert("LINEログイン情報が取得できていません。"); return; }
 
-    // ▼▼▼ ここを変更（ポップアップ表示） ▼▼▼
-    sendingPopup.classList.add('show'); // ポップアップを出す
-    btn.disabled = true; // ボタン無効化
-    // ▲▲▲▲▲▲
+    btn.innerText = "送信中...";
+    btn.disabled = true;
 
     const items = document.querySelectorAll('.date-item');
     const comment = document.getElementById('userComment').value;
@@ -390,21 +360,17 @@
 
     if (sendPromises.length === 0) {
       alert("日程を選択してください");
-      sendingPopup.classList.remove('show'); // 隠す
+      btn.innerText = "選択";
       btn.disabled = false;
       return;
     }
 
     Promise.all(sendPromises)
       .then(() => {
-        // ポップアップが出たままalertが出ると変なので一瞬待つか、
-        // アラート後に閉じる
-        sendingPopup.classList.remove('show'); // 隠す
         alert("登録(更新)しました！");
         liff.closeWindow(); 
       })
       .catch(error => {
-        sendingPopup.classList.remove('show'); // 隠す
         alert("送信処理完了");
         liff.closeWindow();
       });
@@ -413,4 +379,3 @@
 
 </body>
 </html>
-
