@@ -7,43 +7,24 @@
 <script charset="utf-8" src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
 <style>
   :root {
-    --text-color: #111111;
-    --border-color: #f0f0f0;
-    --purple-icon: #9c59d1;
-    --btn-disabled: #dcdcdc;
-    --btn-text-disabled: #ffffff;
-    --line-green: #06c755;
-    
-    /* 曜日カラー */
-    --sat-color: #0066cc;
-    --sun-color: #cc0000;
-
-    /* 選択時のカラー */
-    --ok-bg: #28a745;
-    --maybe-bg: #fd7e14;
-    --ng-bg: #dc3545;
+    --text-color: #111111; --border-color: #f0f0f0; --purple-icon: #9c59d1;
+    --btn-disabled: #dcdcdc; --btn-text-disabled: #ffffff; --line-green: #06c755;
+    --sat-color: #0066cc; --sun-color: #cc0000;
+    --ok-bg: #28a745; --maybe-bg: #fd7e14; --ng-bg: #dc3545;
   }
-
   body {
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-    background-color: #fff;
-    margin: 0; padding: 0;
-    color: var(--text-color);
-    padding-bottom: 90px;
+    background-color: #fff; margin: 0; padding: 0; color: var(--text-color); padding-bottom: 90px;
   }
-
   .header {
-    display: flex; justify-content: center; align-items: center;
-    height: 44px; border-bottom: 1px solid var(--border-color);
+    display: flex; justify-content: center; align-items: center; height: 44px; border-bottom: 1px solid var(--border-color);
     font-weight: bold; font-size: 1rem; position: sticky; top: 0; background: #fff; z-index: 10;
   }
-
   .user-bar {
     background-color: #f2f4f8; padding: 8px 15px; font-size: 0.85rem;
     color: #555; display: flex; align-items: center; justify-content: space-between;
   }
   .user-name-display { font-weight: bold; color: var(--line-green); }
-
   .event-info { padding: 15px 15px 0 15px; display: flex; align-items: center; }
   .calendar-icon {
     width: 44px; height: 44px; background-color: var(--purple-icon);
@@ -51,7 +32,6 @@
   }
   .calendar-icon svg { width: 24px; height: 24px; fill: white; }
   .event-details h2 { font-size: 1rem; margin: 0; }
-
   .month-tabs {
     display: flex; gap: 10px; padding: 15px 15px 0 15px;
     background: #fff; border-bottom: 8px solid #f2f4f8; overflow-x: auto;
@@ -62,30 +42,23 @@
     user-select: none; margin-bottom: 15px; transition: all 0.2s;
   }
   .tab-btn.active {
-    background-color: var(--line-green); color: white;
-    box-shadow: 0 2px 4px rgba(6, 199, 85, 0.3);
+    background-color: var(--line-green); color: white; box-shadow: 0 2px 4px rgba(6, 199, 85, 0.3);
   }
-
   .date-list { list-style: none; padding: 0; margin: 0; }
   .date-item {
     display: flex; justify-content: space-between; align-items: center;
     padding: 18px 15px; border-bottom: 1px solid var(--border-color);
   }
   .date-item.hidden { display: none; }
-  
   .date-text { font-size: 1rem; font-weight: 500; }
-  .sat { color: var(--sat-color); }
-  .sun { color: var(--sun-color); }
-
+  .sat { color: var(--sat-color); } .sun { color: var(--sun-color); }
   .options-group { display: flex; gap: 15px; }
   .option-label {
     cursor: pointer; display: flex; justify-content: center; align-items: center;
     width: 36px; height: 36px; border-radius: 50%; transition: all 0.2s;
-    color: #ccc; font-size: 1.2rem; font-weight: bold;
-    background-color: #f9f9f9;
+    color: #ccc; font-size: 1.2rem; font-weight: bold; background-color: #f9f9f9;
   }
   .option-label input { display: none; }
-
   .option-label:has(input[value="ok"]:checked) {
     background-color: var(--ok-bg); color: white; transform: scale(1.1); box-shadow: 0 2px 5px rgba(40, 167, 69, 0.3);
   }
@@ -95,10 +68,8 @@
   .option-label:has(input[value="ng"]:checked) {
     background-color: var(--ng-bg); color: white; transform: scale(1.1); box-shadow: 0 2px 5px rgba(220, 53, 69, 0.3);
   }
-
   .comment-section { padding: 15px; border-top: 1px solid var(--border-color); }
   .comment-input { width: 100%; border: none; font-size: 0.95rem; outline: none; resize: none; font-family: inherit; }
-  
   .footer {
     position: fixed; bottom: 0; left: 0; width: 100%; background-color: #f9f9f9;
     padding: 10px 15px 25px; border-top: 1px solid #e0e0e0; box-sizing: border-box; z-index: 20;
@@ -109,15 +80,12 @@
     font-weight: bold; cursor: pointer; transition: background-color 0.3s;
   }
   .submit-btn.active { background-color: var(--line-green); color: white; }
-
   #loading { padding: 30px; text-align: center; color: #888; font-size: 0.9rem; }
 </style>
 </head>
 <body>
 
-  <header class="header">
-    <div>日程回答</div>
-  </header>
+  <header class="header"><div>日程回答</div></header>
 
   <div class="user-bar">
     <span>ログイン中: <span id="loginName" class="user-name-display">読み込み中...</span></span>
@@ -127,9 +95,7 @@
     <div class="calendar-icon">
       <svg viewBox="0 0 24 24"><path d="M19 4h-1V2h-2v2H8V2H6v2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V10h14v10zm0-12H5V6h14v2z"/></svg>
     </div>
-    <div class="event-details">
-      <h2 id="eventTitle">テニス練習日程</h2>
-    </div>
+    <div class="event-details"><h2 id="eventTitle">テニス練習日程</h2></div>
   </div>
 
   <div class="month-tabs" id="monthTabs"></div>
@@ -162,82 +128,55 @@
   const loginNameSpan = document.getElementById('loginName');
   const userComment = document.getElementById('userComment');
 
-  window.onload = function() {
-    initializeLiff();
-  };
+  window.onload = function() { initializeLiff(); };
 
   async function initializeLiff() {
     try {
       await liff.init({ liffId: LIFF_ID });
-      if (!liff.isLoggedIn()) {
-        liff.login();
-        return;
-      }
+      if (!liff.isLoggedIn()) { liff.login(); return; }
       const profile = await liff.getProfile();
       myLineName = profile.displayName;
       loginNameSpan.innerText = myLineName;
-      
-      // 日程読み込み開始
       fetchSchedule();
-
     } catch (err) {
       console.error('LIFF Error:', err);
       loadingDiv.innerHTML = "エラーが発生しました。<br>LINEから開いていますか？";
     }
   }
 
-  // 1. カレンダー枠の取得
   function fetchSchedule() {
     fetch(GAS_URL)
       .then(response => response.json())
       .then(data => {
         initApp(data);
-        // カレンダー枠ができたら、次に「自分の過去の回答」を取りに行く
         fetchMyHistory();
       })
-      .catch(error => {
-        console.error(error);
-        loadingDiv.innerHTML = "日程の読み込みに失敗しました";
-      });
+      .catch(error => { loadingDiv.innerHTML = "日程の読み込みに失敗しました"; });
   }
 
-  // 2. 自分の回答履歴の取得
   function fetchMyHistory() {
-    // GASに「?mode=history&name=自分」で問い合わせる
     const historyUrl = `${GAS_URL}?mode=history&name=${encodeURIComponent(myLineName)}`;
-    
     fetch(historyUrl)
       .then(res => res.json())
       .then(history => {
-        loadingDiv.style.display = 'none'; // ロード完了
+        loadingDiv.style.display = 'none';
         applyHistory(history);
       })
-      .catch(err => {
-        console.error("履歴取得エラー:", err);
-        loadingDiv.style.display = 'none'; // エラーでも画面は出す
-      });
+      .catch(err => { loadingDiv.style.display = 'none'; });
   }
 
-  // 3. 画面に履歴を反映させる
   function applyHistory(history) {
     if (!history || Object.keys(history).length === 0) return;
-
-    // 画面上の全日程をループしてチェックを入れる
     const items = document.querySelectorAll('.date-item');
     let hasData = false;
     let lastComment = "";
 
     items.forEach(item => {
-      // ラジオボタンのどれか1つから日付(data-date)を取得
       const radio = item.querySelector('input');
       const dateStr = radio.getAttribute('data-date');
-      
-      // 履歴の中にこの日付のデータがあるか？
       if (history[dateStr]) {
-        const status = history[dateStr].status; // ok, maybe, ng
+        const status = history[dateStr].status;
         const comment = history[dateStr].comment;
-        
-        // そのステータスのラジオボタンを探してチェックする
         const targetRadio = item.querySelector(`input[value="${status}"]`);
         if (targetRadio) {
           targetRadio.checked = true;
@@ -248,8 +187,8 @@
     });
 
     if (hasData) {
-      btn.innerText = "更新する"; // 既にデータがあればボタン名を変える
-      btn.classList.add('active'); // ボタン有効化
+      btn.innerText = "更新する";
+      btn.classList.add('active');
       if (lastComment) userComment.value = lastComment;
     }
   }
@@ -326,6 +265,7 @@
     });
   }
 
+  // ▼▼▼ ここからが一括送信の仕組みです ▼▼▼
   function sendData() {
     const activeBtn = document.querySelector('.submit-btn.active');
     if (!activeBtn) return;
@@ -336,48 +276,52 @@
 
     const items = document.querySelectorAll('.date-item');
     const comment = document.getElementById('userComment').value;
-    const sendPromises = [];
+    const answers = []; // 選択した回答を溜める空の箱
 
     items.forEach(item => {
       const checkedInput = item.querySelector('input:checked');
       if (checkedInput) {
-        const dateStr = checkedInput.getAttribute('data-date');
-        const payload = {
-          userName: myLineName,
-          date: dateStr,
-          status: checkedInput.value,
-          comment: comment
-        };
-        const request = fetch(GAS_URL, {
-          method: "POST",
-          body: JSON.stringify(payload),
-          mode: "no-cors",
-          headers: { "Content-Type": "text/plain" }
+        answers.push({
+          date: checkedInput.getAttribute('data-date'),
+          status: checkedInput.value
         });
-        sendPromises.push(request);
       }
     });
 
-    if (sendPromises.length === 0) {
+    if (answers.length === 0) {
       alert("日程を選択してください");
       btn.innerText = "選択";
       btn.disabled = false;
       return;
     }
 
-    Promise.all(sendPromises)
-      .then(() => {
+    // 1回の通信で送るための「荷物（ペイロード）」を作る
+    const payload = {
+      userName: myLineName,
+      comment: comment,
+      answers: answers
+    };
+
+    fetch(GAS_URL, {
+      method: "POST",
+      body: JSON.stringify(payload),
+      mode: "no-cors",
+      headers: { "Content-Type": "text/plain" }
+    })
+    .then(() => {
+      // 送信完了後、少しだけタメを作ってから確実に画面を閉じる
+      setTimeout(() => {
         alert("登録(更新)しました！");
         liff.closeWindow(); 
-      })
-      .catch(error => {
-        alert("送信処理完了");
-        liff.closeWindow();
-      });
+      }, 500); 
+    })
+    .catch(error => {
+      alert("通信エラーが発生しました。");
+      btn.innerText = "更新する";
+      btn.disabled = false;
+    });
   }
 </script>
 
 </body>
 </html>
-
-
