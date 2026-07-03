@@ -13,8 +13,12 @@
     --btn-disabled: #dcdcdc;
     --btn-text-disabled: #ffffff;
     --line-green: #06c755;
+    
+    /* 曜日カラー */
     --sat-color: #0066cc;
     --sun-color: #cc0000;
+
+    /* 選択時のカラー */
     --ok-bg: #28a745;
     --maybe-bg: #fd7e14;
     --ng-bg: #dc3545;
@@ -102,7 +106,7 @@
   .submit-btn {
     width: 100%; background-color: var(--btn-disabled); color: var(--btn-text-disabled);
     border: none; padding: 14px; border-radius: 6px; font-size: 1rem;
-    font-weight: bold; cursor: pointer; transition: background-color 0.3s;
+    font-weight: bold; cursor: pointer; transition: all 0.3s;
   }
   .submit-btn.active { background-color: var(--line-green); color: white; }
 
@@ -144,6 +148,7 @@
   </footer>
 
 <script>
+  // ▼ あなたの環境設定（念のためGASのURLが今使っている最新のものか確認してください）
   const LIFF_ID = "2008858372-NgwrDQlQ";
   const GAS_URL = "https://script.google.com/macros/s/AKfycbythu55Dpx_6sgwJfQLODlU-FI7OQFjXrrPxvizVQR3vukXgnpKOLHu35z9KTyh-Dra/exec";
   
@@ -310,63 +315,78 @@
     });
   }
 
-  // ▼▼▼ 修正の心臓部！「一括送信」の正しい処理です ▼▼▼
+  // ▼▼▼ フリーズ絶対防止！安全な一括送信処理 ▼▼▼
   function sendData() {
     const activeBtn = document.querySelector('.submit-btn.active');
     if (!activeBtn) return;
-    if (!myLineName) { alert("LINEログイン情報が取得できていません。"); return; }
+    
+    if (!myLineName) { 
+      btn.innerText = "エラー: 画面を開き直してください";
+      btn.style.backgroundColor = "#dc3545"; // 赤色にして知らせる
+      return; 
+    }
 
+    // ボタンを「送信中...」にして押せなくする
     btn.innerText = "送信中...";
     btn.disabled = true;
 
-    const items = document.querySelectorAll('.date-item');
-    const comment = document.getElementById('userComment').value;
-    
-    // 【重要】ここで選んだ答えを一つの箱(配列)にまとめます
-    const answers = []; 
+    try {
+      const items = document.querySelectorAll('.date-item');
+      const comment = document.getElementById('userComment').value;
+      const answers = []; 
 
-    items.forEach(item => {
-      const checkedInput = item.querySelector('input:checked');
-      if (checkedInput) {
-        answers.push({
-          date: checkedInput.getAttribute('data-date'),
-          status: checkedInput.value
-        });
+      items.forEach(item => {
+        const checkedInput = item.querySelector('input:checked');
+        if (checkedInput) {
+          answers.push({
+            date: checkedInput.getAttribute('data-date'),
+            status: checkedInput.value
+          });
+        }
+      });
+
+      if (answers.length === 0) {
+        btn.innerText = "日程を選択してください";
+        setTimeout(() => {
+          btn.innerText = "選択";
+          btn.disabled = false;
+        }, 1500);
+        return;
       }
-    });
 
-    if (answers.length === 0) {
-      alert("日程を選択してください");
-      btn.innerText = "選択";
-      btn.disabled = false;
-      return;
+      const payload = {
+        userName: myLineName,
+        comment: comment,
+        answers: answers 
+      };
+
+      fetch(GAS_URL, {
+        method: "POST",
+        body: JSON.stringify(payload),
+        mode: "no-cors",
+        headers: { "Content-Type": "text/plain" }
+      })
+      .then(() => {
+        // 【重要】alertを使わず、ボタンの文字と色を変える
+        btn.style.backgroundColor = "#0056b3"; // 完了感のある青色
+        btn.innerText = "完了しました！閉じています...";
+        
+        // 1.5秒後に自動で閉じる
+        setTimeout(() => {
+          liff.closeWindow(); 
+        }, 1500); 
+      })
+      .catch(error => {
+        // エラー時は赤色にする
+        btn.style.backgroundColor = "#dc3545";
+        btn.innerText = "通信エラー(もう一度押してください)";
+        btn.disabled = false;
+      });
+
+    } catch (e) {
+      btn.style.backgroundColor = "#dc3545";
+      btn.innerText = "システムエラー";
     }
-
-    // Googleに送る1回分の荷物（ペイロード）を作成
-    const payload = {
-      userName: myLineName,
-      comment: comment,
-      answers: answers // まとめた箱をここでセット！
-    };
-
-    // 通信は1回だけ！
-    fetch(GAS_URL, {
-      method: "POST",
-      body: JSON.stringify(payload),
-      mode: "no-cors",
-      headers: { "Content-Type": "text/plain" }
-    })
-    .then(() => {
-      setTimeout(() => {
-        alert("登録(更新)しました！");
-        liff.closeWindow(); 
-      }, 500); 
-    })
-    .catch(error => {
-      alert("通信エラーが発生しました。");
-      btn.innerText = "更新する";
-      btn.disabled = false;
-    });
   }
 </script>
 
