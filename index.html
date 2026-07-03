@@ -148,7 +148,7 @@
   </footer>
 
 <script>
-  // ▼ あなたの環境設定（念のためGASのURLが今使っている最新のものか確認してください）
+  // ▼ あなたの環境設定
   const LIFF_ID = "2008858372-NgwrDQlQ";
   const GAS_URL = "https://script.google.com/macros/s/AKfycbythu55Dpx_6sgwJfQLODlU-FI7OQFjXrrPxvizVQR3vukXgnpKOLHu35z9KTyh-Dra/exec";
   
@@ -315,24 +315,25 @@
     });
   }
 
-  // ▼▼▼ フリーズ絶対防止！安全な一括送信処理 ▼▼▼
+  // ▼▼▼ フリーズ絶対防止＆一括送信処理 ▼▼▼
   function sendData() {
     const activeBtn = document.querySelector('.submit-btn.active');
     if (!activeBtn) return;
     
     if (!myLineName) { 
       btn.innerText = "エラー: 画面を開き直してください";
-      btn.style.backgroundColor = "#dc3545"; // 赤色にして知らせる
+      btn.style.backgroundColor = "#dc3545"; 
       return; 
     }
 
-    // ボタンを「送信中...」にして押せなくする
     btn.innerText = "送信中...";
     btn.disabled = true;
 
     try {
       const items = document.querySelectorAll('.date-item');
       const comment = document.getElementById('userComment').value;
+      
+      // 【重要】ここで選んだ答えを一つの箱(配列)にまとめます
       const answers = []; 
 
       items.forEach(item => {
@@ -357,9 +358,10 @@
       const payload = {
         userName: myLineName,
         comment: comment,
-        answers: answers 
+        answers: answers // ⬅️ まとめた箱をここでセット！
       };
 
+      // 1回だけ通信する
       fetch(GAS_URL, {
         method: "POST",
         body: JSON.stringify(payload),
@@ -367,8 +369,8 @@
         headers: { "Content-Type": "text/plain" }
       })
       .then(() => {
-        // 【重要】alertを使わず、ボタンの文字と色を変える
-        btn.style.backgroundColor = "#0056b3"; // 完了感のある青色
+        // alertを使わず、ボタンの文字と色を変える
+        btn.style.backgroundColor = "#0056b3"; // 青色
         btn.innerText = "完了しました！閉じています...";
         
         // 1.5秒後に自動で閉じる
@@ -377,8 +379,7 @@
         }, 1500); 
       })
       .catch(error => {
-        // エラー時は赤色にする
-        btn.style.backgroundColor = "#dc3545";
+        btn.style.backgroundColor = "#dc3545"; // 赤色
         btn.innerText = "通信エラー(もう一度押してください)";
         btn.disabled = false;
       });
