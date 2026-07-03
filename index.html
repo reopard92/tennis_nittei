@@ -13,12 +13,8 @@
     --btn-disabled: #dcdcdc;
     --btn-text-disabled: #ffffff;
     --line-green: #06c755;
-    
-    /* 曜日カラー */
     --sat-color: #0066cc;
     --sun-color: #cc0000;
-
-    /* 選択時のカラー */
     --ok-bg: #28a745;
     --maybe-bg: #fd7e14;
     --ng-bg: #dc3545;
@@ -148,7 +144,6 @@
   </footer>
 
 <script>
-  // あなたの設定
   const LIFF_ID = "2008858372-NgwrDQlQ";
   const GAS_URL = "https://script.google.com/macros/s/AKfycbythu55Dpx_6sgwJfQLODlU-FI7OQFjXrrPxvizVQR3vukXgnpKOLHu35z9KTyh-Dra/exec";
   
@@ -178,7 +173,6 @@
       loginNameSpan.innerText = myLineName;
       
       fetchSchedule();
-
     } catch (err) {
       console.error('LIFF Error:', err);
       loadingDiv.innerHTML = "エラーが発生しました。<br>LINEから開いていますか？";
@@ -316,7 +310,7 @@
     });
   }
 
-  // ▼▼▼ 一括送信のための新しい処理 ▼▼▼
+  // ▼▼▼ 修正の心臓部！「一括送信」の正しい処理です ▼▼▼
   function sendData() {
     const activeBtn = document.querySelector('.submit-btn.active');
     if (!activeBtn) return;
@@ -327,9 +321,10 @@
 
     const items = document.querySelectorAll('.date-item');
     const comment = document.getElementById('userComment').value;
-    const answers = []; // 選んだ答えをひとまとめにする箱
+    
+    // 【重要】ここで選んだ答えを一つの箱(配列)にまとめます
+    const answers = []; 
 
-    // チェックがついている全てのボタンを回収
     items.forEach(item => {
       const checkedInput = item.querySelector('input:checked');
       if (checkedInput) {
@@ -351,10 +346,10 @@
     const payload = {
       userName: myLineName,
       comment: comment,
-      answers: answers
+      answers: answers // まとめた箱をここでセット！
     };
 
-    // 1回だけ通信する！
+    // 通信は1回だけ！
     fetch(GAS_URL, {
       method: "POST",
       body: JSON.stringify(payload),
@@ -362,7 +357,6 @@
       headers: { "Content-Type": "text/plain" }
     })
     .then(() => {
-      // 送信完了後、通信が切れないように0.5秒待ってから画面を閉じる
       setTimeout(() => {
         alert("登録(更新)しました！");
         liff.closeWindow(); 
